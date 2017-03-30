@@ -43,8 +43,8 @@ type VariantDecl struct {
 	Members []MemberDecl
 }
 
-type TypeDecl interface {
-	isTypeDecl()
+type Declaration interface {
+	isDeclaration()
 }
 
 type EnumDecl struct {
@@ -53,7 +53,7 @@ type EnumDecl struct {
 	Variants []*VariantDecl
 }
 
-func (n *EnumDecl) isTypeDecl() {
+func (n *EnumDecl) isDeclaration() {
 }
 
 type StructDecl struct {
@@ -62,10 +62,10 @@ type StructDecl struct {
 	Members []MemberDecl
 }
 
-func (n *StructDecl) isTypeDecl() {
+func (n *StructDecl) isDeclaration() {
 }
 
 type File struct {
 	Loc   util.Location
-	Decls []TypeDecl
+	Decls []Declaration
 }

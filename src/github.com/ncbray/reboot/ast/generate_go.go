@@ -8,7 +8,7 @@ import (
 
 type generateGoStructs struct {
 	out *writer.TabbedWriter
-	lut map[string]TypeDecl
+	lut map[string]Declaration
 }
 
 func (g *generateGoStructs) genStructTypeRef(t TypeRef) {
@@ -253,7 +253,7 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 func GenerateGo(file *File, out io.Writer) {
 	g := &generateGoStructs{
 		out: writer.MakeTabbedWriter("\t", out),
-		lut: map[string]TypeDecl{},
+		lut: map[string]Declaration{},
 	}
 	g.genStructFile(file)
 

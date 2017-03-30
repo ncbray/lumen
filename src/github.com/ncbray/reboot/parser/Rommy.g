@@ -13,13 +13,13 @@ variantDecl
   : name=ID '{' (members+=memberDecl)* '}'
   ;
 
-typeDecl
+declaration
   : 'enum' name=ID '{' (variants+=variantDecl)* '}' # enumDecl
   | 'struct' name=ID '{' (members+=memberDecl)* '}' # structDecl
   ;
 
 file
-  : (decls+=typeDecl)* EOF
+  : (decls+=declaration)* EOF
   ;
 
 ID: [a-zA-Z][a-zA-Z0-9]*;

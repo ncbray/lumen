@@ -76,7 +76,7 @@ func (c *ASTConverter) ConvertVariantDeclList(src []parser.IVariantDeclContext) 
 	return dst
 }
 
-func (c *ASTConverter) ConvertTypeDecl(ctx parser.ITypeDeclContext) TypeDecl {
+func (c *ASTConverter) ConvertDeclaration(ctx parser.IDeclarationContext) Declaration {
 	switch ctx := ctx.(type) {
 	case *parser.EnumDeclContext:
 		return &EnumDecl{
@@ -95,10 +95,10 @@ func (c *ASTConverter) ConvertTypeDecl(ctx parser.ITypeDeclContext) TypeDecl {
 	}
 }
 
-func (c *ASTConverter) ConvertTypeDeclList(src []parser.ITypeDeclContext) []TypeDecl {
-	dst := make([]TypeDecl, len(src))
+func (c *ASTConverter) ConvertDeclarationList(src []parser.IDeclarationContext) []Declaration {
+	dst := make([]Declaration, len(src))
 	for i, child := range src {
-		dst[i] = c.ConvertTypeDecl(child)
+		dst[i] = c.ConvertDeclaration(child)
 	}
 	return dst
 }
@@ -108,7 +108,7 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	case *parser.FileContext:
 		return &File{
 			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
-			Decls: c.ConvertTypeDeclList(ctx.GetDecls()),
+			Decls: c.ConvertDeclarationList(ctx.GetDecls()),
 		}
 	default:
 		panic(ctx)

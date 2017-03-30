@@ -56,7 +56,7 @@ var symbolicNames = []string{
 }
 
 var ruleNames = []string{
-	"typeRef", "memberDecl", "variantDecl", "typeDecl", "file",
+	"typeRef", "memberDecl", "variantDecl", "declaration", "file",
 }
 
 type RommyParser struct {
@@ -104,7 +104,7 @@ const (
 	RommyParserRULE_typeRef     = 0
 	RommyParserRULE_memberDecl  = 1
 	RommyParserRULE_variantDecl = 2
-	RommyParserRULE_typeDecl    = 3
+	RommyParserRULE_declaration = 3
 	RommyParserRULE_file        = 4
 )
 
@@ -628,58 +628,58 @@ func (p *RommyParser) VariantDecl() (localctx IVariantDeclContext) {
 	return localctx
 }
 
-// ITypeDeclContext is an interface to support dynamic dispatch.
-type ITypeDeclContext interface {
+// IDeclarationContext is an interface to support dynamic dispatch.
+type IDeclarationContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// IsTypeDeclContext differentiates from other interfaces.
-	IsTypeDeclContext()
+	// IsDeclarationContext differentiates from other interfaces.
+	IsDeclarationContext()
 }
 
-type TypeDeclContext struct {
+type DeclarationContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
 }
 
-func NewEmptyTypeDeclContext() *TypeDeclContext {
-	var p = new(TypeDeclContext)
+func NewEmptyDeclarationContext() *DeclarationContext {
+	var p = new(DeclarationContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RommyParserRULE_typeDecl
+	p.RuleIndex = RommyParserRULE_declaration
 	return p
 }
 
-func (*TypeDeclContext) IsTypeDeclContext() {}
+func (*DeclarationContext) IsDeclarationContext() {}
 
-func NewTypeDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeDeclContext {
-	var p = new(TypeDeclContext)
+func NewDeclarationContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeclarationContext {
+	var p = new(DeclarationContext)
 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = RommyParserRULE_typeDecl
+	p.RuleIndex = RommyParserRULE_declaration
 
 	return p
 }
 
-func (s *TypeDeclContext) GetParser() antlr.Parser { return s.parser }
+func (s *DeclarationContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *TypeDeclContext) CopyFrom(ctx *TypeDeclContext) {
+func (s *DeclarationContext) CopyFrom(ctx *DeclarationContext) {
 	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
 }
 
-func (s *TypeDeclContext) GetRuleContext() antlr.RuleContext {
+func (s *DeclarationContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *TypeDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *DeclarationContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
 type EnumDeclContext struct {
-	*TypeDeclContext
+	*DeclarationContext
 	name         antlr.Token
 	_variantDecl IVariantDeclContext
 	variants     []IVariantDeclContext
@@ -688,9 +688,9 @@ type EnumDeclContext struct {
 func NewEnumDeclContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *EnumDeclContext {
 	var p = new(EnumDeclContext)
 
-	p.TypeDeclContext = NewEmptyTypeDeclContext()
+	p.DeclarationContext = NewEmptyDeclarationContext()
 	p.parser = parser
-	p.CopyFrom(ctx.(*TypeDeclContext))
+	p.CopyFrom(ctx.(*DeclarationContext))
 
 	return p
 }
@@ -751,7 +751,7 @@ func (s *EnumDeclContext) ExitRule(listener antlr.ParseTreeListener) {
 }
 
 type StructDeclContext struct {
-	*TypeDeclContext
+	*DeclarationContext
 	name        antlr.Token
 	_memberDecl IMemberDeclContext
 	members     []IMemberDeclContext
@@ -760,9 +760,9 @@ type StructDeclContext struct {
 func NewStructDeclContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StructDeclContext {
 	var p = new(StructDeclContext)
 
-	p.TypeDeclContext = NewEmptyTypeDeclContext()
+	p.DeclarationContext = NewEmptyDeclarationContext()
 	p.parser = parser
-	p.CopyFrom(ctx.(*TypeDeclContext))
+	p.CopyFrom(ctx.(*DeclarationContext))
 
 	return p
 }
@@ -822,9 +822,9 @@ func (s *StructDeclContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-func (p *RommyParser) TypeDecl() (localctx ITypeDeclContext) {
-	localctx = NewTypeDeclContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, RommyParserRULE_typeDecl)
+func (p *RommyParser) Declaration() (localctx IDeclarationContext) {
+	localctx = NewDeclarationContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 6, RommyParserRULE_declaration)
 	var _la int
 
 	defer func() {
@@ -943,17 +943,17 @@ type IFileContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// Get_typeDecl returns the _typeDecl rule contexts.
-	Get_typeDecl() ITypeDeclContext
+	// Get_declaration returns the _declaration rule contexts.
+	Get_declaration() IDeclarationContext
 
-	// Set_typeDecl sets the _typeDecl rule contexts.
-	Set_typeDecl(ITypeDeclContext)
+	// Set_declaration sets the _declaration rule contexts.
+	Set_declaration(IDeclarationContext)
 
 	// GetDecls returns the decls rule context list.
-	GetDecls() []ITypeDeclContext
+	GetDecls() []IDeclarationContext
 
 	// SetDecls sets the decls rule context list.
-	SetDecls([]ITypeDeclContext)
+	SetDecls([]IDeclarationContext)
 
 	// IsFileContext differentiates from other interfaces.
 	IsFileContext()
@@ -961,9 +961,9 @@ type IFileContext interface {
 
 type FileContext struct {
 	*antlr.BaseParserRuleContext
-	parser    antlr.Parser
-	_typeDecl ITypeDeclContext
-	decls     []ITypeDeclContext
+	parser       antlr.Parser
+	_declaration IDeclarationContext
+	decls        []IDeclarationContext
 }
 
 func NewEmptyFileContext() *FileContext {
@@ -988,39 +988,39 @@ func NewFileContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *FileContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *FileContext) Get_typeDecl() ITypeDeclContext { return s._typeDecl }
+func (s *FileContext) Get_declaration() IDeclarationContext { return s._declaration }
 
-func (s *FileContext) Set_typeDecl(v ITypeDeclContext) { s._typeDecl = v }
+func (s *FileContext) Set_declaration(v IDeclarationContext) { s._declaration = v }
 
-func (s *FileContext) GetDecls() []ITypeDeclContext { return s.decls }
+func (s *FileContext) GetDecls() []IDeclarationContext { return s.decls }
 
-func (s *FileContext) SetDecls(v []ITypeDeclContext) { s.decls = v }
+func (s *FileContext) SetDecls(v []IDeclarationContext) { s.decls = v }
 
 func (s *FileContext) EOF() antlr.TerminalNode {
 	return s.GetToken(RommyParserEOF, 0)
 }
 
-func (s *FileContext) AllTypeDecl() []ITypeDeclContext {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*ITypeDeclContext)(nil)).Elem())
-	var tst = make([]ITypeDeclContext, len(ts))
+func (s *FileContext) AllDeclaration() []IDeclarationContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IDeclarationContext)(nil)).Elem())
+	var tst = make([]IDeclarationContext, len(ts))
 
 	for i, t := range ts {
 		if t != nil {
-			tst[i] = t.(ITypeDeclContext)
+			tst[i] = t.(IDeclarationContext)
 		}
 	}
 
 	return tst
 }
 
-func (s *FileContext) TypeDecl(i int) ITypeDeclContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITypeDeclContext)(nil)).Elem(), i)
+func (s *FileContext) Declaration(i int) IDeclarationContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IDeclarationContext)(nil)).Elem(), i)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(ITypeDeclContext)
+	return t.(IDeclarationContext)
 }
 
 func (s *FileContext) GetRuleContext() antlr.RuleContext {
@@ -1073,11 +1073,11 @@ func (p *RommyParser) File() (localctx IFileContext) {
 		{
 			p.SetState(52)
 
-			var _x = p.TypeDecl()
+			var _x = p.Declaration()
 
-			localctx.(*FileContext)._typeDecl = _x
+			localctx.(*FileContext)._declaration = _x
 		}
-		localctx.(*FileContext).decls = append(localctx.(*FileContext).decls, localctx.(*FileContext)._typeDecl)
+		localctx.(*FileContext).decls = append(localctx.(*FileContext).decls, localctx.(*FileContext)._declaration)
 
 		p.SetState(57)
 		p.GetErrorHandler().Sync(p)

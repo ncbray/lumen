@@ -19,7 +19,7 @@ struct VariantDecl {
   var Members []MemberDecl;
 }
 
-enum TypeDecl {
+enum Declaration {
   EnumDecl {
     var Name string;
     var Variants []VariantDecl;
@@ -31,5 +31,5 @@ enum TypeDecl {
 }
 
 struct File {
-  var Decls []TypeDecl;
+  var Decls []Declaration;
 }
