@@ -7,8 +7,9 @@ import (
 )
 
 type generateGoStructs struct {
-	out *writer.TabbedWriter
-	lut map[string]Declaration
+	out   *writer.TabbedWriter
+	lut   map[string]Declaration
+	isAst bool
 }
 
 func (g *generateGoStructs) genStructTypeRef(t TypeRef) {
@@ -76,7 +77,9 @@ func (g *generateGoStructs) genStructFile(file *File) {
 				g.out.EndOfLine()
 				g.out.WriteLine("type " + v.Name + " struct {")
 				g.out.Indent()
-				g.out.WriteLine("Loc util.Location")
+				if g.isAst {
+					g.out.WriteLine("Loc util.Location")
+				}
 				for _, m := range v.Members {
 					g.genStructMemberDecl(m)
 				}
@@ -93,7 +96,9 @@ func (g *generateGoStructs) genStructFile(file *File) {
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " struct {")
 			g.out.Indent()
-			g.out.WriteLine("Loc util.Location")
+			if g.isAst {
+				g.out.WriteLine("Loc util.Location")
+			}
 			for _, m := range d.Members {
 				g.genStructMemberDecl(m)
 			}
@@ -161,7 +166,9 @@ func (g *generateGoStructs) genConvFile(file *File) {
 				g.out.Indent()
 				g.out.WriteLine("return &" + v.Name + " {")
 				g.out.Indent()
-				g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
+				if g.isAst {
+					g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
+				}
 				for _, m := range v.Members {
 					g.genConvMember(m)
 				}
@@ -192,7 +199,9 @@ func (g *generateGoStructs) genConvFile(file *File) {
 			g.out.Indent()
 			g.out.WriteLine("return &" + d.Name + " {")
 			g.out.Indent()
-			g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
+			if g.isAst {
+				g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
+			}
 			for _, m := range d.Members {
 				g.genConvMember(m)
 			}
@@ -250,14 +259,16 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 	}
 }
 
-func GenerateGo(file *File, out io.Writer) {
+func GenerateGo(file *File, isAst bool, out io.Writer) {
 	g := &generateGoStructs{
-		out: writer.MakeTabbedWriter("\t", out),
-		lut: map[string]Declaration{},
+		out:   writer.MakeTabbedWriter("\t", out),
+		lut:   map[string]Declaration{},
+		isAst: isAst,
 	}
 	g.genStructFile(file)
 
-	g.out.WriteLine("================================================================================")
-
-	g.genConvFile(file)
+	if isAst {
+		g.out.WriteLine("================================================================================")
+		g.genConvFile(file)
+	}
 }

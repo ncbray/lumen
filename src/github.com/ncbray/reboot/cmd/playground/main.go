@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/ncbray/cmdline"
 	"github.com/ncbray/compilerutil/fs"
 	"github.com/ncbray/reboot/ast"
 	"github.com/ncbray/reboot/log"
@@ -67,15 +68,15 @@ func parseFile(filename string, ctx *Context) *ast.File {
 	return conv.ConvertFile(fileTree.(*parser.FileContext))
 }
 
-func compile(filename string, ctx *Context) {
+func compile(filename string, isAst bool, ctx *Context) {
 	file := parseFile(filename, ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		return
 	}
-	ast.GenerateGo(file, os.Stdout)
+	ast.GenerateGo(file, isAst, os.Stdout)
 }
 
-func run() bool {
+func run(input string, isAst bool) bool {
 	logger := log.CreateConsoleLogger()
 
 	tdir, err := fs.MakeTempDir("mecha_")
@@ -91,7 +92,7 @@ func run() bool {
 		Logger:     logger,
 	}
 
-	compile(os.Args[1], ctx)
+	compile(input, isAst, ctx)
 
 	if ctx.Logger.NumErrors() > 0 {
 		fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
@@ -103,7 +104,29 @@ func run() bool {
 }
 
 func main() {
-	if !run() {
+	inputFile := &cmdline.FilePath{
+		MustExist: true,
+	}
+
+	var isAst bool
+	var input string
+
+	app := cmdline.MakeApp("playground")
+	app.Flags([]*cmdline.Flag{
+		{
+			Long: "ast",
+			Call: cmdline.SetTrue(&isAst),
+		},
+	})
+	app.RequiredArgs([]*cmdline.Argument{
+		{
+			Name:  "input",
+			Value: inputFile.Set(&input),
+		},
+	})
+	app.Run(os.Args[1:])
+
+	if !run(input, isAst) {
 		os.Exit(1)
 	}
 }
