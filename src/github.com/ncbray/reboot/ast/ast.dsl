@@ -19,6 +19,7 @@ struct VariantDecl {
   var Members []MemberDecl;
 }
 
+// Top-level declarations
 enum Declaration {
   EnumDecl {
     var Name string;
@@ -30,6 +31,7 @@ enum Declaration {
   }
 }
 
+// Compilation unit
 struct File {
   var Decls []Declaration;
 }

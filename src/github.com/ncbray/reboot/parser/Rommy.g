@@ -24,4 +24,5 @@ file
 
 ID: [a-zA-Z][a-zA-Z0-9]*;
 NUM: [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)?;
-WS: [ \t\r\n] -> channel(HIDDEN);
+SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
+WS: [ \t\r\n]+ -> channel(HIDDEN);

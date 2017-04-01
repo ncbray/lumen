@@ -16,7 +16,7 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 12, 63, 4,
+	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 13, 63, 4,
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 3, 2, 3, 2, 3,
 	2, 5, 2, 16, 10, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 4, 3, 4, 7,
 	4, 26, 10, 4, 12, 4, 14, 4, 29, 11, 4, 3, 4, 3, 4, 3, 5, 3, 5, 3, 5, 3,
@@ -52,7 +52,7 @@ var literalNames = []string{
 }
 
 var symbolicNames = []string{
-	"", "", "", "", "", "", "", "", "ID", "NUM", "WS",
+	"", "", "", "", "", "", "", "", "ID", "NUM", "SINGLE_LINE_COMMENT", "WS",
 }
 
 var ruleNames = []string{
@@ -86,17 +86,18 @@ func NewRommyParser(input antlr.TokenStream) *RommyParser {
 
 // RommyParser tokens.
 const (
-	RommyParserEOF  = antlr.TokenEOF
-	RommyParserT__0 = 1
-	RommyParserT__1 = 2
-	RommyParserT__2 = 3
-	RommyParserT__3 = 4
-	RommyParserT__4 = 5
-	RommyParserT__5 = 6
-	RommyParserT__6 = 7
-	RommyParserID   = 8
-	RommyParserNUM  = 9
-	RommyParserWS   = 10
+	RommyParserEOF                 = antlr.TokenEOF
+	RommyParserT__0                = 1
+	RommyParserT__1                = 2
+	RommyParserT__2                = 3
+	RommyParserT__3                = 4
+	RommyParserT__4                = 5
+	RommyParserT__5                = 6
+	RommyParserT__6                = 7
+	RommyParserID                  = 8
+	RommyParserNUM                 = 9
+	RommyParserSINGLE_LINE_COMMENT = 10
+	RommyParserWS                  = 11
 )
 
 // RommyParser rules.
