@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/ncbray/cmdline"
@@ -73,7 +74,18 @@ func compile(filename string, isAst bool, ctx *Context) {
 	if ctx.Logger.NumErrors() > 0 {
 		return
 	}
-	ast.GenerateGo(file, isAst, os.Stdout)
+	dir, _ := filepath.Split(filename)
+	_, pkg := filepath.Split(dir[:len(dir)-1])
+	//ext := filepath.Ext(leaf)
+	//leaf = leaf[:len(leaf)-len(ext)] + ".go"
+
+	out := ctx.FileSystem.OutputFile(dir+"generated.go", 0644)
+	ow, err := out.GetWriter()
+	if err != nil {
+		ctx.Logger.Error(err.Error())
+	}
+	defer ow.Close()
+	ast.GenerateGo(pkg, file, isAst, ow)
 }
 
 func run(input string, isAst bool) bool {

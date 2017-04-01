@@ -48,8 +48,7 @@ func (g *generateGoStructs) genStructMemberDecl(m MemberDecl) {
 	}
 }
 
-func (g *generateGoStructs) genStructFile(file *File) {
-	// Index
+func (g *generateGoStructs) index(file *File) {
 	for _, d := range file.Decls {
 		switch d := d.(type) {
 		case *EnumDecl:
@@ -60,9 +59,9 @@ func (g *generateGoStructs) genStructFile(file *File) {
 			panic(d)
 		}
 	}
+}
 
-	generateGoHeader("ast", []string{"github.com/ncbray/reboot/util"}, g.out)
-
+func (g *generateGoStructs) genStructFile(file *File) {
 	for _, d := range file.Decls {
 		switch d := d.(type) {
 		case *EnumDecl:
@@ -139,11 +138,6 @@ func (g *generateGoStructs) genConvMember(m MemberDecl) {
 }
 
 func (g *generateGoStructs) genConvFile(file *File) {
-	generateGoHeader("ast", []string{
-		"github.com/ncbray/reboot/parser",
-		"github.com/ncbray/reboot/util",
-	}, g.out)
-
 	convCls := "ASTConverter"
 
 	g.out.EndOfLine()
@@ -259,16 +253,23 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 	}
 }
 
-func GenerateGo(file *File, isAst bool, out io.Writer) {
+func GenerateGo(pkg string, file *File, isAst bool, out io.Writer) {
 	g := &generateGoStructs{
 		out:   writer.MakeTabbedWriter("\t", out),
 		lut:   map[string]Declaration{},
 		isAst: isAst,
 	}
-	g.genStructFile(file)
+	g.index(file)
 
+	imports := []string{}
 	if isAst {
-		g.out.WriteLine("================================================================================")
+		imports = append(imports, "github.com/ncbray/reboot/parser")
+	}
+	imports = append(imports, "github.com/ncbray/reboot/util")
+	generateGoHeader(pkg, imports, g.out)
+
+	g.genStructFile(file)
+	if isAst {
 		g.genConvFile(file)
 	}
 }
