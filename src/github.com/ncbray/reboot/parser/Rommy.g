@@ -1,5 +1,7 @@
 grammar Rommy;
 
+import Unicode;
+
 typeRef
   : name=ID # typeName
   | '[]' element=typeRef # listRef
@@ -22,7 +24,13 @@ file
   : (decls+=declaration)* EOF
   ;
 
-ID: [a-zA-Z][a-zA-Z0-9]*;
+ID: Letter (Letter | UnicodeDigit) *;
 NUM: [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)?;
+
+fragment Letter
+  : UnicodeLetter
+  | [_]
+  ;
+
 SINGLE_LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
 WS: [ \t\r\n]+ -> channel(HIDDEN);
