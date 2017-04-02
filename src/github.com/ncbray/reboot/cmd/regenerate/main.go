@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/ncbray/cmdline"
 	"github.com/ncbray/compilerutil/fs"
 	"github.com/ncbray/reboot/ast"
 	"github.com/ncbray/reboot/log"
@@ -70,7 +69,7 @@ func parseFile(filename string, ctx *Context) *ast.File {
 	return conv.ConvertFile(fileTree.(*parser.FileContext))
 }
 
-func compile(filename string, isAst bool, ctx *Context) {
+func compile(filename string, isAst bool, outdir string, ctx *Context) {
 	file := parseFile(filename, ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		return
@@ -81,12 +80,9 @@ func compile(filename string, isAst bool, ctx *Context) {
 		return
 	}
 
-	dir, _ := filepath.Split(filename)
-	_, pkg := filepath.Split(dir[:len(dir)-1])
-	//ext := filepath.Ext(leaf)
-	//leaf = leaf[:len(leaf)-len(ext)] + ".go"
+	_, pkg := filepath.Split(outdir)
 
-	out := ctx.FileSystem.OutputFile(dir+"generated.go", 0644)
+	out := ctx.FileSystem.OutputFile(filepath.Join(outdir, "generated.go"), 0644)
 	ow, err := out.GetWriter()
 	if err != nil {
 		ctx.Logger.Error(err.Error())
@@ -95,7 +91,7 @@ func compile(filename string, isAst bool, ctx *Context) {
 	resolved.GenerateGo(pkg, rfile, isAst, ow)
 }
 
-func run(input string, isAst bool) bool {
+func run() bool {
 	logger := log.CreateConsoleLogger()
 
 	tdir, err := fs.MakeTempDir("mecha_")
@@ -111,8 +107,15 @@ func run(input string, isAst bool) bool {
 		Logger:     logger,
 	}
 
-	compile(input, isAst, ctx)
+	pkgPath := "src/github.com/ncbray/reboot"
 
+	compile(filepath.Join(pkgPath, "_dsl/ast.dsl"), true, filepath.Join(pkgPath, "ast"), ctx)
+	if ctx.Logger.NumErrors() > 0 {
+		fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
+		return false
+	}
+
+	compile(filepath.Join(pkgPath, "_dsl/resolved.dsl"), false, filepath.Join(pkgPath, "resolved"), ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
 		return false
@@ -123,29 +126,7 @@ func run(input string, isAst bool) bool {
 }
 
 func main() {
-	inputFile := &cmdline.FilePath{
-		MustExist: true,
-	}
-
-	var isAst bool
-	var input string
-
-	app := cmdline.MakeApp("playground")
-	app.Flags([]*cmdline.Flag{
-		{
-			Long: "ast",
-			Call: cmdline.SetTrue(&isAst),
-		},
-	})
-	app.RequiredArgs([]*cmdline.Argument{
-		{
-			Name:  "input",
-			Value: inputFile.Set(&input),
-		},
-	})
-	app.Run(os.Args[1:])
-
-	if !run(input, isAst) {
+	if !run() {
 		os.Exit(1)
 	}
 }
