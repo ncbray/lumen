@@ -11,6 +11,7 @@ type TypeRef interface {
 
 type TypeName struct {
 	Loc  util.Location
+	Temp interface{}
 	Name string
 }
 
@@ -19,6 +20,7 @@ func (n *TypeName) isTypeRef() {
 
 type ListRef struct {
 	Loc     util.Location
+	Temp    interface{}
 	Element TypeRef
 }
 
@@ -31,6 +33,7 @@ type MemberDecl interface {
 
 type FieldDecl struct {
 	Loc  util.Location
+	Temp interface{}
 	Name string
 	T    TypeRef
 }
@@ -40,6 +43,7 @@ func (n *FieldDecl) isMemberDecl() {
 
 type VariantDecl struct {
 	Loc     util.Location
+	Temp    interface{}
 	Name    string
 	Members []MemberDecl
 }
@@ -50,6 +54,7 @@ type Declaration interface {
 
 type EnumDecl struct {
 	Loc      util.Location
+	Temp     interface{}
 	Name     string
 	Variants []*VariantDecl
 }
@@ -59,6 +64,7 @@ func (n *EnumDecl) isDeclaration() {
 
 type StructDecl struct {
 	Loc     util.Location
+	Temp    interface{}
 	Name    string
 	Members []MemberDecl
 }
@@ -68,6 +74,7 @@ func (n *StructDecl) isDeclaration() {
 
 type File struct {
 	Loc   util.Location
+	Temp  interface{}
 	Decls []Declaration
 }
 

@@ -1,4 +1,4 @@
-package ast
+package resolved
 
 import (
 	"io"
@@ -8,26 +8,19 @@ import (
 
 type generateGoStructs struct {
 	out   *writer.TabbedWriter
-	lut   map[string]Declaration
 	isAst bool
 }
 
-func (g *generateGoStructs) genStructTypeRef(t TypeRef) {
+func (g *generateGoStructs) genStructTypeRef(t Type) {
 	switch t := t.(type) {
-	case *TypeName:
-		isStruct := false
-		d, ok := g.lut[t.Name]
-		if ok {
-			_, ok = d.(*StructDecl)
-			if ok {
-				isStruct = true
-			}
-		}
-		if isStruct {
-			g.out.WriteString("*")
-		}
+	case *Intrinsic:
 		g.out.WriteString(t.Name)
-	case *ListRef:
+	case *Struct:
+		g.out.WriteString("*")
+		g.out.WriteString(t.Name)
+	case *Enum:
+		g.out.WriteString(t.Name)
+	case *List:
 		g.out.WriteString("[]")
 		g.genStructTypeRef(t.Element)
 	default:
@@ -36,35 +29,17 @@ func (g *generateGoStructs) genStructTypeRef(t TypeRef) {
 
 }
 
-func (g *generateGoStructs) genStructMemberDecl(m MemberDecl) {
-	switch m := m.(type) {
-	case *FieldDecl:
-		g.out.WriteString(m.Name)
-		g.out.WriteString(" ")
-		g.genStructTypeRef(m.T)
-		g.out.EndOfLine()
-	default:
-		panic(m)
-	}
-}
-
-func (g *generateGoStructs) index(file *File) {
-	for _, d := range file.Decls {
-		switch d := d.(type) {
-		case *EnumDecl:
-			g.lut[d.Name] = d
-		case *StructDecl:
-			g.lut[d.Name] = d
-		default:
-			panic(d)
-		}
-	}
+func (g *generateGoStructs) genStructField(f *Field) {
+	g.out.WriteString(f.Name)
+	g.out.WriteString(" ")
+	g.genStructTypeRef(f.Type)
+	g.out.EndOfLine()
 }
 
 func (g *generateGoStructs) genStructFile(file *File) {
-	for _, d := range file.Decls {
+	for _, d := range file.Types {
 		switch d := d.(type) {
-		case *EnumDecl:
+		case *Enum:
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " interface {")
 			g.out.Indent()
@@ -78,9 +53,11 @@ func (g *generateGoStructs) genStructFile(file *File) {
 				g.out.Indent()
 				if g.isAst {
 					g.out.WriteLine("Loc util.Location")
+					// HACK to make translation simpler.
+					g.out.WriteLine("Temp interface{}")
 				}
-				for _, m := range v.Members {
-					g.genStructMemberDecl(m)
+				for _, f := range v.Fields {
+					g.genStructField(f)
 				}
 				g.out.Dedent()
 				g.out.WriteLine("}")
@@ -91,15 +68,17 @@ func (g *generateGoStructs) genStructFile(file *File) {
 				g.out.Dedent()
 				g.out.WriteLine("}")
 			}
-		case *StructDecl:
+		case *Struct:
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " struct {")
 			g.out.Indent()
 			if g.isAst {
 				g.out.WriteLine("Loc util.Location")
+				// HACK to make translation simpler.
+				g.out.WriteLine("Temp interface{}")
 			}
-			for _, m := range d.Members {
-				g.genStructMemberDecl(m)
+			for _, f := range d.Fields {
+				g.genStructField(f)
 			}
 			g.out.Dedent()
 			g.out.WriteLine("}")
@@ -109,32 +88,38 @@ func (g *generateGoStructs) genStructFile(file *File) {
 	}
 }
 
-func (g *generateGoStructs) genConvMember(m MemberDecl) {
-	switch m := m.(type) {
-	case *FieldDecl:
-		g.out.WriteString(m.Name)
-		g.out.WriteString(": ")
-		switch t := m.T.(type) {
-		case *TypeName:
-			if t.Name == "string" {
-				g.out.WriteString("ctx.Get" + m.Name + "().GetText()")
-			} else {
-				g.out.WriteString("c.Convert" + t.Name + "(ctx.Get" + m.Name + "())")
-			}
-		case *ListRef:
-			elem, ok := t.Element.(*TypeName)
-			if !ok {
-				panic(t.Element)
-			}
-			g.out.WriteString("c.Convert" + elem.Name + "List(ctx.Get" + m.Name + "())")
-		default:
-			panic(t)
+func (g *generateGoStructs) genConvField(f *Field) {
+	name := f.Name
+	g.out.WriteString(name)
+	g.out.WriteString(": ")
+	switch t := f.Type.(type) {
+	case *Intrinsic:
+		if t.Name != "string" {
+			panic(t.Name)
 		}
-		g.out.WriteString(",")
-		g.out.EndOfLine()
+		g.out.WriteString("ctx.Get" + name + "().GetText()")
+	case *Struct:
+		g.out.WriteString("c.Convert" + t.Name + "(ctx.Get" + name + "())")
+	case *Enum:
+		g.out.WriteString("c.Convert" + t.Name + "(ctx.Get" + name + "())")
+	case *List:
+		var elName string
+		switch et := t.Element.(type) {
+		case *Intrinsic:
+			elName = et.Name
+		case *Enum:
+			elName = et.Name
+		case *Struct:
+			elName = et.Name
+		default:
+			panic(et)
+		}
+		g.out.WriteString("c.Convert" + elName + "List(ctx.Get" + name + "())")
 	default:
-		panic(m)
+		panic(t)
 	}
+	g.out.WriteString(",")
+	g.out.EndOfLine()
 }
 
 func (g *generateGoStructs) genConvFile(file *File) {
@@ -147,9 +132,9 @@ func (g *generateGoStructs) genConvFile(file *File) {
 	g.out.Dedent()
 	g.out.WriteLine("}")
 
-	for _, d := range file.Decls {
+	for _, d := range file.Types {
 		switch d := d.(type) {
-		case *EnumDecl:
+		case *Enum:
 			g.out.EndOfLine()
 			g.out.WriteLine("func (c *" + convCls + ") Convert" + d.Name + "(ctx parser.I" + d.Name + "Context) " + d.Name + " {")
 			g.out.Indent()
@@ -163,8 +148,8 @@ func (g *generateGoStructs) genConvFile(file *File) {
 				if g.isAst {
 					g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
 				}
-				for _, m := range v.Members {
-					g.genConvMember(m)
+				for _, f := range v.Fields {
+					g.genConvField(f)
 				}
 				g.out.Dedent()
 				g.out.WriteLine("}")
@@ -182,7 +167,7 @@ func (g *generateGoStructs) genConvFile(file *File) {
 
 			generateConvList(convCls, d.Name, false, g.out)
 
-		case *StructDecl:
+		case *Struct:
 			g.out.EndOfLine()
 			g.out.WriteLine("func (c *" + convCls + ") Convert" + d.Name + "(ctx parser.I" + d.Name + "Context) *" + d.Name + " {")
 			g.out.Indent()
@@ -196,8 +181,8 @@ func (g *generateGoStructs) genConvFile(file *File) {
 			if g.isAst {
 				g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
 			}
-			for _, m := range d.Members {
-				g.genConvMember(m)
+			for _, f := range d.Fields {
+				g.genConvField(f)
 			}
 			g.out.Dedent()
 			g.out.WriteLine("}")
@@ -256,16 +241,14 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 func GenerateGo(pkg string, file *File, isAst bool, out io.Writer) {
 	g := &generateGoStructs{
 		out:   writer.MakeTabbedWriter("\t", out),
-		lut:   map[string]Declaration{},
 		isAst: isAst,
 	}
-	g.index(file)
 
 	imports := []string{}
 	if isAst {
 		imports = append(imports, "github.com/ncbray/reboot/parser")
+		imports = append(imports, "github.com/ncbray/reboot/util")
 	}
-	imports = append(imports, "github.com/ncbray/reboot/util")
 	generateGoHeader(pkg, imports, g.out)
 
 	g.genStructFile(file)

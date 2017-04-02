@@ -11,6 +11,7 @@ import (
 	"github.com/ncbray/reboot/ast"
 	"github.com/ncbray/reboot/log"
 	"github.com/ncbray/reboot/parser"
+	"github.com/ncbray/reboot/resolved"
 )
 
 type FileStream struct {
@@ -74,6 +75,12 @@ func compile(filename string, isAst bool, ctx *Context) {
 	if ctx.Logger.NumErrors() > 0 {
 		return
 	}
+
+	rfile := resolved.FromAST(file, ctx.Logger)
+	if ctx.Logger.NumErrors() > 0 {
+		return
+	}
+
 	dir, _ := filepath.Split(filename)
 	_, pkg := filepath.Split(dir[:len(dir)-1])
 	//ext := filepath.Ext(leaf)
@@ -85,7 +92,7 @@ func compile(filename string, isAst bool, ctx *Context) {
 		ctx.Logger.Error(err.Error())
 	}
 	defer ow.Close()
-	ast.GenerateGo(pkg, file, isAst, ow)
+	resolved.GenerateGo(pkg, rfile, isAst, ow)
 }
 
 func run(input string, isAst bool) bool {
