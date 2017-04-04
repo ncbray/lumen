@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"github.com/ncbray/reboot/parser"
-	"github.com/ncbray/reboot/util"
+	"github.com/ncbray/lumen/metacompiler/parser"
+	"github.com/ncbray/lumen/util"
 )
 
 type TypeRef interface {

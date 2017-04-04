@@ -16,31 +16,35 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 13, 63, 4,
+	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 14, 73, 4,
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 3, 2, 3, 2, 3,
 	2, 5, 2, 16, 10, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 4, 3, 4, 7,
 	4, 26, 10, 4, 12, 4, 14, 4, 29, 11, 4, 3, 4, 3, 4, 3, 5, 3, 5, 3, 5, 3,
 	5, 7, 5, 37, 10, 5, 12, 5, 14, 5, 40, 11, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3,
-	5, 7, 5, 47, 10, 5, 12, 5, 14, 5, 50, 11, 5, 3, 5, 5, 5, 53, 10, 5, 3,
-	6, 7, 6, 56, 10, 6, 12, 6, 14, 6, 59, 11, 6, 3, 6, 3, 6, 3, 6, 2, 2, 7,
-	2, 4, 6, 8, 10, 2, 2, 63, 2, 15, 3, 2, 2, 2, 4, 17, 3, 2, 2, 2, 6, 22,
-	3, 2, 2, 2, 8, 52, 3, 2, 2, 2, 10, 57, 3, 2, 2, 2, 12, 16, 7, 10, 2, 2,
+	5, 7, 5, 47, 10, 5, 12, 5, 14, 5, 50, 11, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3,
+	5, 7, 5, 57, 10, 5, 12, 5, 14, 5, 60, 11, 5, 3, 5, 5, 5, 63, 10, 5, 3,
+	6, 7, 6, 66, 10, 6, 12, 6, 14, 6, 69, 11, 6, 3, 6, 3, 6, 3, 6, 2, 2, 7,
+	2, 4, 6, 8, 10, 2, 2, 75, 2, 15, 3, 2, 2, 2, 4, 17, 3, 2, 2, 2, 6, 22,
+	3, 2, 2, 2, 8, 62, 3, 2, 2, 2, 10, 67, 3, 2, 2, 2, 12, 16, 7, 11, 2, 2,
 	13, 14, 7, 3, 2, 2, 14, 16, 5, 2, 2, 2, 15, 12, 3, 2, 2, 2, 15, 13, 3,
-	2, 2, 2, 16, 3, 3, 2, 2, 2, 17, 18, 7, 4, 2, 2, 18, 19, 7, 10, 2, 2, 19,
-	20, 5, 2, 2, 2, 20, 21, 7, 5, 2, 2, 21, 5, 3, 2, 2, 2, 22, 23, 7, 10, 2,
+	2, 2, 2, 16, 3, 3, 2, 2, 2, 17, 18, 7, 4, 2, 2, 18, 19, 7, 11, 2, 2, 19,
+	20, 5, 2, 2, 2, 20, 21, 7, 5, 2, 2, 21, 5, 3, 2, 2, 2, 22, 23, 7, 11, 2,
 	2, 23, 27, 7, 6, 2, 2, 24, 26, 5, 4, 3, 2, 25, 24, 3, 2, 2, 2, 26, 29,
 	3, 2, 2, 2, 27, 25, 3, 2, 2, 2, 27, 28, 3, 2, 2, 2, 28, 30, 3, 2, 2, 2,
 	29, 27, 3, 2, 2, 2, 30, 31, 7, 7, 2, 2, 31, 7, 3, 2, 2, 2, 32, 33, 7, 8,
-	2, 2, 33, 34, 7, 10, 2, 2, 34, 38, 7, 6, 2, 2, 35, 37, 5, 6, 4, 2, 36,
+	2, 2, 33, 34, 7, 11, 2, 2, 34, 38, 7, 6, 2, 2, 35, 37, 5, 6, 4, 2, 36,
 	35, 3, 2, 2, 2, 37, 40, 3, 2, 2, 2, 38, 36, 3, 2, 2, 2, 38, 39, 3, 2, 2,
-	2, 39, 41, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 41, 53, 7, 7, 2, 2, 42, 43,
-	7, 9, 2, 2, 43, 44, 7, 10, 2, 2, 44, 48, 7, 6, 2, 2, 45, 47, 5, 4, 3, 2,
+	2, 39, 41, 3, 2, 2, 2, 40, 38, 3, 2, 2, 2, 41, 63, 7, 7, 2, 2, 42, 43,
+	7, 9, 2, 2, 43, 44, 7, 11, 2, 2, 44, 48, 7, 6, 2, 2, 45, 47, 5, 4, 3, 2,
 	46, 45, 3, 2, 2, 2, 47, 50, 3, 2, 2, 2, 48, 46, 3, 2, 2, 2, 48, 49, 3,
-	2, 2, 2, 49, 51, 3, 2, 2, 2, 50, 48, 3, 2, 2, 2, 51, 53, 7, 7, 2, 2, 52,
-	32, 3, 2, 2, 2, 52, 42, 3, 2, 2, 2, 53, 9, 3, 2, 2, 2, 54, 56, 5, 8, 5,
-	2, 55, 54, 3, 2, 2, 2, 56, 59, 3, 2, 2, 2, 57, 55, 3, 2, 2, 2, 57, 58,
-	3, 2, 2, 2, 58, 60, 3, 2, 2, 2, 59, 57, 3, 2, 2, 2, 60, 61, 7, 2, 2, 3,
-	61, 11, 3, 2, 2, 2, 8, 15, 27, 38, 48, 52, 57,
+	2, 2, 2, 49, 51, 3, 2, 2, 2, 50, 48, 3, 2, 2, 2, 51, 63, 7, 7, 2, 2, 52,
+	53, 7, 10, 2, 2, 53, 54, 7, 11, 2, 2, 54, 58, 7, 6, 2, 2, 55, 57, 5, 8,
+	5, 2, 56, 55, 3, 2, 2, 2, 57, 60, 3, 2, 2, 2, 58, 56, 3, 2, 2, 2, 58, 59,
+	3, 2, 2, 2, 59, 61, 3, 2, 2, 2, 60, 58, 3, 2, 2, 2, 61, 63, 7, 7, 2, 2,
+	62, 32, 3, 2, 2, 2, 62, 42, 3, 2, 2, 2, 62, 52, 3, 2, 2, 2, 63, 9, 3, 2,
+	2, 2, 64, 66, 5, 8, 5, 2, 65, 64, 3, 2, 2, 2, 66, 69, 3, 2, 2, 2, 67, 65,
+	3, 2, 2, 2, 67, 68, 3, 2, 2, 2, 68, 70, 3, 2, 2, 2, 69, 67, 3, 2, 2, 2,
+	70, 71, 7, 2, 2, 3, 71, 11, 3, 2, 2, 2, 9, 15, 27, 38, 48, 58, 62, 67,
 }
 
 var deserializer = antlr.NewATNDeserializer(nil)
@@ -48,11 +52,12 @@ var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "'[]'", "'var'", "';'", "'{'", "'}'", "'enum'", "'struct'",
+	"", "'[]'", "'var'", "';'", "'{'", "'}'", "'enum'", "'struct'", "'region'",
 }
 
 var symbolicNames = []string{
-	"", "", "", "", "", "", "", "", "ID", "NUM", "SINGLE_LINE_COMMENT", "WS",
+	"", "", "", "", "", "", "", "", "", "ID", "NUM", "SINGLE_LINE_COMMENT",
+	"WS",
 }
 
 var ruleNames = []string{
@@ -94,10 +99,11 @@ const (
 	RommyParserT__4                = 5
 	RommyParserT__5                = 6
 	RommyParserT__6                = 7
-	RommyParserID                  = 8
-	RommyParserNUM                 = 9
-	RommyParserSINGLE_LINE_COMMENT = 10
-	RommyParserWS                  = 11
+	RommyParserT__7                = 8
+	RommyParserID                  = 9
+	RommyParserNUM                 = 10
+	RommyParserSINGLE_LINE_COMMENT = 11
+	RommyParserWS                  = 12
 )
 
 // RommyParser rules.
@@ -823,6 +829,78 @@ func (s *StructDeclContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+type RegionDeclContext struct {
+	*DeclarationContext
+	name         antlr.Token
+	_declaration IDeclarationContext
+	decls        []IDeclarationContext
+}
+
+func NewRegionDeclContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RegionDeclContext {
+	var p = new(RegionDeclContext)
+
+	p.DeclarationContext = NewEmptyDeclarationContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*DeclarationContext))
+
+	return p
+}
+
+func (s *RegionDeclContext) GetName() antlr.Token { return s.name }
+
+func (s *RegionDeclContext) SetName(v antlr.Token) { s.name = v }
+
+func (s *RegionDeclContext) Get_declaration() IDeclarationContext { return s._declaration }
+
+func (s *RegionDeclContext) Set_declaration(v IDeclarationContext) { s._declaration = v }
+
+func (s *RegionDeclContext) GetDecls() []IDeclarationContext { return s.decls }
+
+func (s *RegionDeclContext) SetDecls(v []IDeclarationContext) { s.decls = v }
+
+func (s *RegionDeclContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *RegionDeclContext) ID() antlr.TerminalNode {
+	return s.GetToken(RommyParserID, 0)
+}
+
+func (s *RegionDeclContext) AllDeclaration() []IDeclarationContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IDeclarationContext)(nil)).Elem())
+	var tst = make([]IDeclarationContext, len(ts))
+
+	for i, t := range ts {
+		if t != nil {
+			tst[i] = t.(IDeclarationContext)
+		}
+	}
+
+	return tst
+}
+
+func (s *RegionDeclContext) Declaration(i int) IDeclarationContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IDeclarationContext)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IDeclarationContext)
+}
+
+func (s *RegionDeclContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RommyListener); ok {
+		listenerT.EnterRegionDecl(s)
+	}
+}
+
+func (s *RegionDeclContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RommyListener); ok {
+		listenerT.ExitRegionDecl(s)
+	}
+}
+
 func (p *RommyParser) Declaration() (localctx IDeclarationContext) {
 	localctx = NewDeclarationContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 6, RommyParserRULE_declaration)
@@ -844,7 +922,7 @@ func (p *RommyParser) Declaration() (localctx IDeclarationContext) {
 		}
 	}()
 
-	p.SetState(50)
+	p.SetState(60)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
@@ -927,6 +1005,47 @@ func (p *RommyParser) Declaration() (localctx IDeclarationContext) {
 		}
 		{
 			p.SetState(49)
+			p.Match(RommyParserT__4)
+		}
+
+	case RommyParserT__7:
+		localctx = NewRegionDeclContext(p, localctx)
+		p.EnterOuterAlt(localctx, 3)
+		{
+			p.SetState(50)
+			p.Match(RommyParserT__7)
+		}
+		{
+			p.SetState(51)
+
+			var _m = p.Match(RommyParserID)
+
+			localctx.(*RegionDeclContext).name = _m
+		}
+		{
+			p.SetState(52)
+			p.Match(RommyParserT__3)
+		}
+		p.SetState(56)
+		p.GetErrorHandler().Sync(p)
+		_la = p.GetTokenStream().LA(1)
+
+		for ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RommyParserT__5)|(1<<RommyParserT__6)|(1<<RommyParserT__7))) != 0 {
+			{
+				p.SetState(53)
+
+				var _x = p.Declaration()
+
+				localctx.(*RegionDeclContext)._declaration = _x
+			}
+			localctx.(*RegionDeclContext).decls = append(localctx.(*RegionDeclContext).decls, localctx.(*RegionDeclContext)._declaration)
+
+			p.SetState(58)
+			p.GetErrorHandler().Sync(p)
+			_la = p.GetTokenStream().LA(1)
+		}
+		{
+			p.SetState(59)
 			p.Match(RommyParserT__4)
 		}
 
@@ -1066,13 +1185,13 @@ func (p *RommyParser) File() (localctx IFileContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(55)
+	p.SetState(65)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == RommyParserT__5 || _la == RommyParserT__6 {
+	for ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RommyParserT__5)|(1<<RommyParserT__6)|(1<<RommyParserT__7))) != 0 {
 		{
-			p.SetState(52)
+			p.SetState(62)
 
 			var _x = p.Declaration()
 
@@ -1080,12 +1199,12 @@ func (p *RommyParser) File() (localctx IFileContext) {
 		}
 		localctx.(*FileContext).decls = append(localctx.(*FileContext).decls, localctx.(*FileContext)._declaration)
 
-		p.SetState(57)
+		p.SetState(67)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(58)
+		p.SetState(68)
 		p.Match(RommyParserEOF)
 	}
 

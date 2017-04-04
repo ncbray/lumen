@@ -246,8 +246,8 @@ func GenerateGo(pkg string, file *File, isAst bool, out io.Writer) {
 
 	imports := []string{}
 	if isAst {
-		imports = append(imports, "github.com/ncbray/reboot/parser")
-		imports = append(imports, "github.com/ncbray/reboot/util")
+		imports = append(imports, "github.com/ncbray/lumen/metacompiler/parser")
+		imports = append(imports, "github.com/ncbray/lumen/util")
 	}
 	generateGoHeader(pkg, imports, g.out)
 

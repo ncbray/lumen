@@ -57,6 +57,12 @@ func (s *BaseRommyListener) EnterStructDecl(ctx *StructDeclContext) {}
 // ExitStructDecl is called when production structDecl is exited.
 func (s *BaseRommyListener) ExitStructDecl(ctx *StructDeclContext) {}
 
+// EnterRegionDecl is called when production regionDecl is entered.
+func (s *BaseRommyListener) EnterRegionDecl(ctx *RegionDeclContext) {}
+
+// ExitRegionDecl is called when production regionDecl is exited.
+func (s *BaseRommyListener) ExitRegionDecl(ctx *RegionDeclContext) {}
+
 // EnterFile is called when production file is entered.
 func (s *BaseRommyListener) EnterFile(ctx *FileContext) {}
 

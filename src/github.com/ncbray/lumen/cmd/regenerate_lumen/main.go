@@ -7,10 +7,10 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/ncbray/compilerutil/fs"
-	"github.com/ncbray/reboot/ast"
-	"github.com/ncbray/reboot/log"
-	"github.com/ncbray/reboot/parser"
-	"github.com/ncbray/reboot/resolved"
+	"github.com/ncbray/lumen/log"
+	"github.com/ncbray/lumen/metacompiler/ast"
+	"github.com/ncbray/lumen/metacompiler/parser"
+	"github.com/ncbray/lumen/metacompiler/resolved"
 )
 
 type FileStream struct {
@@ -107,15 +107,16 @@ func run() bool {
 		Logger:     logger,
 	}
 
-	pkgPath := "src/github.com/ncbray/reboot"
+	pkgPath := "src/github.com/ncbray/lumen"
+	metacompilerPath := filepath.Join(pkgPath, "metacompiler")
 
-	compile(filepath.Join(pkgPath, "_dsl/ast.dsl"), true, filepath.Join(pkgPath, "ast"), ctx)
+	compile(filepath.Join(metacompilerPath, "_dsl/ast.dsl"), true, filepath.Join(metacompilerPath, "ast"), ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
 		return false
 	}
 
-	compile(filepath.Join(pkgPath, "_dsl/resolved.dsl"), false, filepath.Join(pkgPath, "resolved"), ctx)
+	compile(filepath.Join(metacompilerPath, "_dsl/resolved.dsl"), false, filepath.Join(metacompilerPath, "resolved"), ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
 		return false

@@ -3,8 +3,8 @@ package resolved
 import (
 	"fmt"
 
-	"github.com/ncbray/reboot/ast"
-	"github.com/ncbray/reboot/log"
+	"github.com/ncbray/lumen/log"
+	"github.com/ncbray/lumen/metacompiler/ast"
 )
 
 type namespace struct {
