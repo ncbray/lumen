@@ -238,7 +238,7 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 	}
 }
 
-func GenerateGo(pkg string, file *File, isAst bool, out io.Writer) {
+func GenerateGo(pkg string, file *File, isAst bool, parserPackage string, out io.Writer) {
 	g := &generateGoStructs{
 		out:   writer.MakeTabbedWriter("\t", out),
 		isAst: isAst,
@@ -246,7 +246,7 @@ func GenerateGo(pkg string, file *File, isAst bool, out io.Writer) {
 
 	imports := []string{}
 	if isAst {
-		imports = append(imports, "github.com/ncbray/lumen/metacompiler/parser")
+		imports = append(imports, parserPackage)
 		imports = append(imports, "github.com/ncbray/lumen/util")
 	}
 	generateGoHeader(pkg, imports, g.out)
