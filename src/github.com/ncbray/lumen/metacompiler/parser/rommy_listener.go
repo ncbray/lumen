@@ -26,6 +26,9 @@ type RommyListener interface {
 	// EnterStructDecl is called when entering the structDecl production.
 	EnterStructDecl(c *StructDeclContext)
 
+	// EnterHolderDecl is called when entering the holderDecl production.
+	EnterHolderDecl(c *HolderDeclContext)
+
 	// EnterRegionDecl is called when entering the regionDecl production.
 	EnterRegionDecl(c *RegionDeclContext)
 
@@ -49,6 +52,9 @@ type RommyListener interface {
 
 	// ExitStructDecl is called when exiting the structDecl production.
 	ExitStructDecl(c *StructDeclContext)
+
+	// ExitHolderDecl is called when exiting the holderDecl production.
+	ExitHolderDecl(c *HolderDeclContext)
 
 	// ExitRegionDecl is called when exiting the regionDecl production.
 	ExitRegionDecl(c *RegionDeclContext)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/ncbray/lumen/log"
 	"github.com/ncbray/lumen/metacompiler/ast"
+	"github.com/ncbray/lumen/util"
 )
 
 type namespace struct {
@@ -46,6 +47,11 @@ func listOfType(t Type) Type {
 			t.List = &List{Element: t}
 		}
 		return t.List
+	case *Holder:
+		if t.List == nil {
+			t.List = &List{Element: t}
+		}
+		return t.List
 	case *List:
 		if t.List == nil {
 			t.List = &List{Element: t}
@@ -73,6 +79,17 @@ func resolveType(ref ast.TypeRef, ns *namespace, logger log.CompilerLogger) Type
 		return listOfType(t)
 	default:
 		panic(ref)
+	}
+}
+
+func typeRefLoc(t ast.TypeRef) util.Location {
+	switch t := t.(type) {
+	case *ast.TypeName:
+		return t.Loc
+	case *ast.ListRef:
+		return t.Loc
+	default:
+		panic(t)
 	}
 }
 
@@ -146,6 +163,18 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			ns.Define(d.Name, t)
 			types = append(types, t)
 			d.Temp = t
+		case *ast.HolderDecl:
+			if ns.IsDefined(d.Name) {
+				loc := d.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Attempted to redefine %q.", d.Name))
+				continue
+			}
+			t := &Holder{
+				Name: d.Name,
+			}
+			ns.Define(d.Name, t)
+			types = append(types, t)
+			d.Temp = t
 		default:
 			panic(d)
 		}
@@ -167,6 +196,19 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 		case *ast.StructDecl:
 			s := d.Temp.(*Struct)
 			s.Fields = resolveMembers("struct "+d.Name, d.Members, ns, logger)
+		case *ast.HolderDecl:
+			h := d.Temp.(*Holder)
+			for _, ref := range d.Types {
+				t := resolveType(ref, ns, logger)
+				switch t := t.(type) {
+				case *Struct:
+					h.Types = append(h.Types, t)
+					t.Holders = append(t.Holders, h)
+				default:
+					loc := typeRefLoc(ref)
+					logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Type must be a struct.")
+				}
+			}
 		default:
 			panic(d)
 		}

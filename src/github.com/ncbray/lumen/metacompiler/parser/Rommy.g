@@ -18,6 +18,7 @@ variantDecl
 declaration
   : 'enum' name=ID '{' (variants+=variantDecl)* '}' # enumDecl
   | 'struct' name=ID '{' (members+=memberDecl)* '}' # structDecl
+  | 'holder' name=ID '{' (types+=typeRef ';')* '}' # holderDecl
   | 'region' name=ID '{' (decls+=declaration)* '}' # regionDecl
   ;
 

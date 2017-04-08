@@ -72,6 +72,16 @@ type StructDecl struct {
 func (n *StructDecl) isDeclaration() {
 }
 
+type HolderDecl struct {
+	Loc   util.Location
+	Temp  interface{}
+	Name  string
+	Types []TypeRef
+}
+
+func (n *HolderDecl) isDeclaration() {
+}
+
 type File struct {
 	Loc   util.Location
 	Temp  interface{}
@@ -162,6 +172,12 @@ func (c *ASTConverter) ConvertDeclaration(ctx parser.IDeclarationContext) Declar
 			Loc:     util.GetLocation(c.Filename, ctx.GetStart()),
 			Name:    ctx.GetName().GetText(),
 			Members: c.ConvertMemberDeclList(ctx.GetMembers()),
+		}
+	case *parser.HolderDeclContext:
+		return &HolderDecl{
+			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:  ctx.GetName().GetText(),
+			Types: c.ConvertTypeRefList(ctx.GetTypes()),
 		}
 	default:
 		panic(ctx)

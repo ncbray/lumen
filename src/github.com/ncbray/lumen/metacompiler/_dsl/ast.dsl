@@ -29,6 +29,10 @@ enum Declaration {
     var Name string;
     var Members []MemberDecl;
   }
+  HolderDecl {
+    var Name string;
+    var Types []TypeRef;
+  }
 }
 
 // Compilation unit

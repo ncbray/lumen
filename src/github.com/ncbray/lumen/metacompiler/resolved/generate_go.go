@@ -18,6 +18,8 @@ func (g *generateGoStructs) genStructTypeRef(t Type) {
 	case *Struct:
 		g.out.WriteString("*")
 		g.out.WriteString(t.Name)
+	case *Holder:
+		g.out.WriteString(t.Name)
 	case *Enum:
 		g.out.WriteString(t.Name)
 	case *List:
@@ -68,6 +70,13 @@ func (g *generateGoStructs) genStructFile(file *File) {
 				g.out.Dedent()
 				g.out.WriteLine("}")
 			}
+		case *Holder:
+			g.out.EndOfLine()
+			g.out.WriteLine("type " + d.Name + " interface {")
+			g.out.Indent()
+			g.out.WriteLine("is" + d.Name + "()")
+			g.out.Dedent()
+			g.out.WriteLine("}")
 		case *Struct:
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " struct {")
@@ -82,6 +91,14 @@ func (g *generateGoStructs) genStructFile(file *File) {
 			}
 			g.out.Dedent()
 			g.out.WriteLine("}")
+
+			for _, h := range d.Holders {
+				g.out.EndOfLine()
+				g.out.WriteLine("func (n *" + d.Name + ") is" + h.Name + "() {")
+				g.out.Indent()
+				g.out.Dedent()
+				g.out.WriteLine("}")
+			}
 		default:
 			panic(d)
 		}
@@ -108,6 +125,8 @@ func (g *generateGoStructs) genConvField(f *Field) {
 		case *Intrinsic:
 			elName = et.Name
 		case *Enum:
+			elName = et.Name
+		case *Holder:
 			elName = et.Name
 		case *Struct:
 			elName = et.Name
@@ -149,6 +168,39 @@ func (g *generateGoStructs) genConvFile(file *File) {
 					g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
 				}
 				for _, f := range v.Fields {
+					g.genConvField(f)
+				}
+				g.out.Dedent()
+				g.out.WriteLine("}")
+				g.out.Dedent()
+			}
+
+			g.out.WriteLine("default:")
+			g.out.Indent()
+			g.out.WriteLine("panic(ctx)")
+			g.out.Dedent()
+			g.out.WriteLine("}")
+
+			g.out.Dedent()
+			g.out.WriteLine("}")
+
+			generateConvList(convCls, d.Name, false, g.out)
+
+		case *Holder:
+			g.out.EndOfLine()
+			g.out.WriteLine("func (c *" + convCls + ") Convert" + d.Name + "(ctx parser.I" + d.Name + "Context) " + d.Name + " {")
+			g.out.Indent()
+			g.out.WriteLine("switch ctx := ctx.(type) {")
+
+			for _, t := range d.Types {
+				g.out.WriteLine("case *parser." + t.Name + "Context:")
+				g.out.Indent()
+				g.out.WriteLine("return &" + t.Name + " {")
+				g.out.Indent()
+				if g.isAst {
+					g.out.WriteLine("Loc: util.GetLocation(c.Filename, ctx.GetStart()),")
+				}
+				for _, f := range t.Fields {
 					g.genConvField(f)
 				}
 				g.out.Dedent()
