@@ -20,6 +20,24 @@ type RommyListener interface {
 	// EnterVariantDecl is called when entering the variantDecl production.
 	EnterVariantDecl(c *VariantDeclContext)
 
+	// EnterKeywordArg is called when entering the keywordArg production.
+	EnterKeywordArg(c *KeywordArgContext)
+
+	// EnterConstruct is called when entering the construct production.
+	EnterConstruct(c *ConstructContext)
+
+	// EnterNameRef is called when entering the nameRef production.
+	EnterNameRef(c *NameRefContext)
+
+	// EnterParamDecl is called when entering the paramDecl production.
+	EnterParamDecl(c *ParamDeclContext)
+
+	// EnterParserBindingMapping is called when entering the parserBindingMapping production.
+	EnterParserBindingMapping(c *ParserBindingMappingContext)
+
+	// EnterParserBindingGroup is called when entering the parserBindingGroup production.
+	EnterParserBindingGroup(c *ParserBindingGroupContext)
+
 	// EnterEnumDecl is called when entering the enumDecl production.
 	EnterEnumDecl(c *EnumDeclContext)
 
@@ -31,6 +49,9 @@ type RommyListener interface {
 
 	// EnterRegionDecl is called when entering the regionDecl production.
 	EnterRegionDecl(c *RegionDeclContext)
+
+	// EnterParserBindingDecl is called when entering the parserBindingDecl production.
+	EnterParserBindingDecl(c *ParserBindingDeclContext)
 
 	// EnterFile is called when entering the file production.
 	EnterFile(c *FileContext)
@@ -47,6 +68,24 @@ type RommyListener interface {
 	// ExitVariantDecl is called when exiting the variantDecl production.
 	ExitVariantDecl(c *VariantDeclContext)
 
+	// ExitKeywordArg is called when exiting the keywordArg production.
+	ExitKeywordArg(c *KeywordArgContext)
+
+	// ExitConstruct is called when exiting the construct production.
+	ExitConstruct(c *ConstructContext)
+
+	// ExitNameRef is called when exiting the nameRef production.
+	ExitNameRef(c *NameRefContext)
+
+	// ExitParamDecl is called when exiting the paramDecl production.
+	ExitParamDecl(c *ParamDeclContext)
+
+	// ExitParserBindingMapping is called when exiting the parserBindingMapping production.
+	ExitParserBindingMapping(c *ParserBindingMappingContext)
+
+	// ExitParserBindingGroup is called when exiting the parserBindingGroup production.
+	ExitParserBindingGroup(c *ParserBindingGroupContext)
+
 	// ExitEnumDecl is called when exiting the enumDecl production.
 	ExitEnumDecl(c *EnumDeclContext)
 
@@ -58,6 +97,9 @@ type RommyListener interface {
 
 	// ExitRegionDecl is called when exiting the regionDecl production.
 	ExitRegionDecl(c *RegionDeclContext)
+
+	// ExitParserBindingDecl is called when exiting the parserBindingDecl production.
+	ExitParserBindingDecl(c *ParserBindingDeclContext)
 
 	// ExitFile is called when exiting the file production.
 	ExitFile(c *FileContext)

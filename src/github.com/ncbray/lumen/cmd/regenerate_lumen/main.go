@@ -52,7 +52,7 @@ func parseFile(filename string, ctx *Context) *ast.File {
 	return conv.ConvertFile(fileTree.(*parser.FileContext))
 }
 
-func compile(filename string, isAst bool, parserPackage string, outdir string, ctx *Context) {
+func compile(filename string, parserPackage string, outdir string, ctx *Context) {
 	file := parseFile(filename, ctx)
 	if ctx.Logger.NumErrors() > 0 {
 		return
@@ -71,7 +71,7 @@ func compile(filename string, isAst bool, parserPackage string, outdir string, c
 		ctx.Logger.Error(err.Error())
 	}
 	defer ow.Close()
-	resolved.GenerateGo(pkg, rfile, isAst, parserPackage, ow)
+	resolved.GenerateGo(pkg, rfile, parserPackage, ow)
 }
 
 func run() bool {
@@ -114,7 +114,7 @@ func run() bool {
 	for _, b := range batches {
 		for _, f := range b.Files {
 			dstPkg := f[:strings.Index(f, ".")]
-			compile(filepath.Join(b.SrcDir, f), dstPkg == "ast", b.ParserPackage, filepath.Join(b.DstDir, dstPkg), ctx)
+			compile(filepath.Join(b.SrcDir, f), b.ParserPackage, filepath.Join(b.DstDir, dstPkg), ctx)
 			if ctx.Logger.NumErrors() > 0 {
 				fmt.Fprintf(os.Stderr, "%d errors, stopping\n", logger.NumErrors())
 				return false

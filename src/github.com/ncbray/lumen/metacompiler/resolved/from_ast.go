@@ -113,11 +113,93 @@ func resolveMembers(scopeName string, members []ast.MemberDecl, ns *namespace, l
 	return fields
 }
 
+func resolveParserInput(t ast.TypeRef, groupLUT map[string]*ParserBindingGroup, logger log.CompilerLogger) ParserBindingInput {
+	switch t := t.(type) {
+	case *ast.TypeName:
+		if t.Name == "string" {
+			return &InputSlice{}
+		}
+		gref, ok := groupLUT[t.Name]
+		if !ok {
+			loc := t.Loc
+			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown rule %q.", t.Name))
+			return nil
+		}
+		return gref
+	case *ast.ListRef:
+		switch t := t.Element.(type) {
+		case *ast.TypeName:
+			gref, ok := groupLUT[t.Name]
+			if !ok {
+				loc := t.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown rule %q.", t.Name))
+				return nil
+			}
+			if gref.List == nil {
+				gref.List = &InputList{
+					Element: gref,
+				}
+			}
+			return gref.List
+		default:
+			panic(t)
+		}
+	default:
+		panic(t)
+	}
+}
+
+func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBindingParam, ns *namespace, builtins *namespace, logger log.CompilerLogger) ParserBindingExpr {
+	switch e := e.(type) {
+	case *ast.NameRef:
+		if e.Name == "loc_start" {
+			return &GetLocStart{}
+		}
+		p, ok := paramLUT[e.Name]
+		if ok {
+			return &GetParam{
+				Param: p,
+			}
+		}
+		panic(e.Name)
+	case *ast.Construct:
+		args := []*KeywordArg{}
+		for _, arg := range e.Args {
+			value := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
+			args = append(args, &KeywordArg{
+				Name:  arg.Name,
+				Value: value,
+			})
+		}
+		/*
+			t := ns.ResolveType(e.Name)
+			if t == nil {
+				loc := e.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown type %q.", e.Name))
+				return nil, nil
+			}
+			st, ok := t.(*Struct)
+			if !ok {
+				loc := e.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Can only construct structures.")
+				return nil, nil
+			}
+		*/
+		return &Construct{
+			Type: e.Name,
+			Args: args,
+		}
+	default:
+		panic(e)
+	}
+}
+
 func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	builtins := &namespace{
 		parent: nil,
 		types: map[string]Type{
 			"string": &Intrinsic{Name: "string"},
+			"bool":   &Intrinsic{Name: "bool"},
 		},
 	}
 	ns := &namespace{
@@ -126,6 +208,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	}
 	// Generate types.
 	types := []Type{}
+	var parserBinding *ParserBinding
 	for _, d := range src.Decls {
 		switch d := d.(type) {
 		case *ast.EnumDecl:
@@ -175,6 +258,16 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			ns.Define(d.Name, t)
 			types = append(types, t)
 			d.Temp = t
+		case *ast.ParserBindingDecl:
+			if parserBinding != nil {
+				loc := d.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Only one parser binding allowed.")
+				continue
+			}
+			b := &ParserBinding{}
+			d.Temp = b
+			parserBinding = b
+			// TODO
 		default:
 			panic(d)
 		}
@@ -209,6 +302,73 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 					logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Type must be a struct.")
 				}
 			}
+		case *ast.ParserBindingDecl:
+			b := d.Temp.(*ParserBinding)
+			groups := []*ParserBindingGroup{}
+			groupLUT := map[string]*ParserBindingGroup{}
+			for _, g := range d.Groups {
+				_, ok := groupLUT[g.Name]
+				if ok {
+					loc := g.Loc
+					logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Attempted to redefine %q.", g.Name))
+					continue
+				}
+				rg := &ParserBindingGroup{
+					Name: g.Name,
+					Type: resolveType(g.T, ns, logger),
+				}
+				g.Temp = rg
+				groups = append(groups, rg)
+			}
+			b.Groups = groups
+		default:
+			panic(d)
+		}
+	}
+	if logger.NumErrors() > 0 {
+		return nil
+	}
+
+	// Resolve function bodies.
+	for _, d := range src.Decls {
+		switch d := d.(type) {
+		case *ast.EnumDecl, *ast.StructDecl, *ast.HolderDecl:
+		case *ast.ParserBindingDecl:
+			//b := d.Temp.(*ParserBinding)
+
+			// Index
+			groupLUT := map[string]*ParserBindingGroup{}
+			for _, g := range d.Groups {
+				rg := g.Temp.(*ParserBindingGroup)
+				groupLUT[g.Name] = rg
+			}
+
+			// Process
+			for _, g := range d.Groups {
+				rg := g.Temp.(*ParserBindingGroup)
+				mappings := []*ParserBindingMapping{}
+				for _, m := range g.Mappings {
+					params := []*ParserBindingParam{}
+					paramLUT := map[string]*ParserBindingParam{}
+					for _, p := range m.Params {
+						rp := &ParserBindingParam{
+							Name:  p.Name,
+							Input: resolveParserInput(p.T, groupLUT, logger),
+						}
+						params = append(params, rp)
+						paramLUT[p.Name] = rp
+					}
+					// TODO check type
+					e := resolveBindingExpr(m.Body, paramLUT, ns, builtins, logger)
+					rm := &ParserBindingMapping{
+						Rule:   m.Name,
+						Params: params,
+						Body:   e,
+					}
+					mappings = append(mappings, rm)
+				}
+				rg.Mappings = mappings
+			}
 		default:
 			panic(d)
 		}
@@ -218,6 +378,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	}
 
 	return &File{
-		Types: types,
+		Types:         types,
+		ParserBinding: parserBinding,
 	}
 }

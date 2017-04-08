@@ -15,11 +15,33 @@ variantDecl
   : name=ID '{' (members+=memberDecl)* '}'
   ;
 
+keywordArg
+  : name=ID ':' value=parserBindingExpr
+  ;
+
+parserBindingExpr
+  : name=ID '{' (args+=keywordArg (',' args+=keywordArg)*)? '}' # construct
+  | name=ID # nameRef
+  ;
+
+paramDecl
+  : name=ID t=typeRef
+  ;
+
+parserBindingMapping
+  : name=ID '(' (params+=paramDecl (',' params+=paramDecl)*)? ')' '=>' body=parserBindingExpr
+  ;
+
+parserBindingGroup
+  : name=ID ':' t=typeRef '{' (mappings+=parserBindingMapping)* '}'
+  ;
+
 declaration
   : 'enum' name=ID '{' (variants+=variantDecl)* '}' # enumDecl
   | 'struct' name=ID '{' (members+=memberDecl)* '}' # structDecl
   | 'holder' name=ID '{' (types+=typeRef ';')* '}' # holderDecl
   | 'region' name=ID '{' (decls+=declaration)* '}' # regionDecl
+  | 'parser' '{' (groups+=parserBindingGroup)* '}' # parserBindingDecl
   ;
 
 file

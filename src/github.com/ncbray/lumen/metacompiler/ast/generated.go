@@ -48,6 +48,59 @@ type VariantDecl struct {
 	Members []MemberDecl
 }
 
+type KeywordArg struct {
+	Loc   util.Location
+	Temp  interface{}
+	Name  string
+	Value ParserBindingExpr
+}
+
+type ParserBindingExpr interface {
+	isParserBindingExpr()
+}
+
+type Construct struct {
+	Loc  util.Location
+	Temp interface{}
+	Name string
+	Args []*KeywordArg
+}
+
+func (n *Construct) isParserBindingExpr() {
+}
+
+type NameRef struct {
+	Loc  util.Location
+	Temp interface{}
+	Name string
+}
+
+func (n *NameRef) isParserBindingExpr() {
+}
+
+type ParamDecl struct {
+	Loc  util.Location
+	Temp interface{}
+	Name string
+	T    TypeRef
+}
+
+type ParserBindingMapping struct {
+	Loc    util.Location
+	Temp   interface{}
+	Name   string
+	Params []*ParamDecl
+	Body   ParserBindingExpr
+}
+
+type ParserBindingGroup struct {
+	Loc      util.Location
+	Temp     interface{}
+	Name     string
+	T        TypeRef
+	Mappings []*ParserBindingMapping
+}
+
 type Declaration interface {
 	isDeclaration()
 }
@@ -80,6 +133,15 @@ type HolderDecl struct {
 }
 
 func (n *HolderDecl) isDeclaration() {
+}
+
+type ParserBindingDecl struct {
+	Loc    util.Location
+	Temp   interface{}
+	Groups []*ParserBindingGroup
+}
+
+func (n *ParserBindingDecl) isDeclaration() {
 }
 
 type File struct {
@@ -159,6 +221,110 @@ func (c *ASTConverter) ConvertVariantDeclList(src []parser.IVariantDeclContext) 
 	return dst
 }
 
+func (c *ASTConverter) ConvertKeywordArg(ctx parser.IKeywordArgContext) *KeywordArg {
+	switch ctx := ctx.(type) {
+	case *parser.KeywordArgContext:
+		return &KeywordArg{
+			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:  ctx.GetName().GetText(),
+			Value: c.ConvertParserBindingExpr(ctx.GetValue()),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertKeywordArgList(src []parser.IKeywordArgContext) []*KeywordArg {
+	dst := make([]*KeywordArg, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertKeywordArg(child)
+	}
+	return dst
+}
+
+func (c *ASTConverter) ConvertParserBindingExpr(ctx parser.IParserBindingExprContext) ParserBindingExpr {
+	switch ctx := ctx.(type) {
+	case *parser.ConstructContext:
+		return &Construct{
+			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
+			Name: ctx.GetName().GetText(),
+			Args: c.ConvertKeywordArgList(ctx.GetArgs()),
+		}
+	case *parser.NameRefContext:
+		return &NameRef{
+			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
+			Name: ctx.GetName().GetText(),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertParamDecl(ctx parser.IParamDeclContext) *ParamDecl {
+	switch ctx := ctx.(type) {
+	case *parser.ParamDeclContext:
+		return &ParamDecl{
+			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
+			Name: ctx.GetName().GetText(),
+			T:    c.ConvertTypeRef(ctx.GetT()),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertParamDeclList(src []parser.IParamDeclContext) []*ParamDecl {
+	dst := make([]*ParamDecl, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertParamDecl(child)
+	}
+	return dst
+}
+
+func (c *ASTConverter) ConvertParserBindingMapping(ctx parser.IParserBindingMappingContext) *ParserBindingMapping {
+	switch ctx := ctx.(type) {
+	case *parser.ParserBindingMappingContext:
+		return &ParserBindingMapping{
+			Loc:    util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:   ctx.GetName().GetText(),
+			Params: c.ConvertParamDeclList(ctx.GetParams()),
+			Body:   c.ConvertParserBindingExpr(ctx.GetBody()),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertParserBindingMappingList(src []parser.IParserBindingMappingContext) []*ParserBindingMapping {
+	dst := make([]*ParserBindingMapping, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertParserBindingMapping(child)
+	}
+	return dst
+}
+
+func (c *ASTConverter) ConvertParserBindingGroup(ctx parser.IParserBindingGroupContext) *ParserBindingGroup {
+	switch ctx := ctx.(type) {
+	case *parser.ParserBindingGroupContext:
+		return &ParserBindingGroup{
+			Loc:      util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:     ctx.GetName().GetText(),
+			T:        c.ConvertTypeRef(ctx.GetT()),
+			Mappings: c.ConvertParserBindingMappingList(ctx.GetMappings()),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertParserBindingGroupList(src []parser.IParserBindingGroupContext) []*ParserBindingGroup {
+	dst := make([]*ParserBindingGroup, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertParserBindingGroup(child)
+	}
+	return dst
+}
+
 func (c *ASTConverter) ConvertDeclaration(ctx parser.IDeclarationContext) Declaration {
 	switch ctx := ctx.(type) {
 	case *parser.EnumDeclContext:
@@ -178,6 +344,11 @@ func (c *ASTConverter) ConvertDeclaration(ctx parser.IDeclarationContext) Declar
 			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
 			Name:  ctx.GetName().GetText(),
 			Types: c.ConvertTypeRefList(ctx.GetTypes()),
+		}
+	case *parser.ParserBindingDeclContext:
+		return &ParserBindingDecl{
+			Loc:    util.GetLocation(c.Filename, ctx.GetStart()),
+			Groups: c.ConvertParserBindingGroupList(ctx.GetGroups()),
 		}
 	default:
 		panic(ctx)
@@ -202,12 +373,4 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	default:
 		panic(ctx)
 	}
-}
-
-func (c *ASTConverter) ConvertFileList(src []parser.IFileContext) []*File {
-	dst := make([]*File, len(src))
-	for i, child := range src {
-		dst[i] = c.ConvertFile(child)
-	}
-	return dst
 }

@@ -37,10 +37,31 @@ enum Statement {
 
 struct ShaderDecl {
   var Name string;
-  var Fs []Statement;
   var Vs []Statement;
+  var Fs []Statement;
 }
 
 struct File {
   var Shaders []ShaderDecl;
+}
+
+parser {
+  expr:Expr {
+    getName(name string) => GetName{Loc: loc_start, Name: name}
+    number(raw string) => Number{Loc: loc_start, Raw: raw}
+    prefix(op string, value expr) => Prefix{Loc: loc_start, Op: op, Value: value}
+    infix(left expr, op string, right expr) => Infix{Loc: loc_start, Left: left, Op: op, Right: right}
+    call(value expr, args []expr) => Call{Loc: loc_start, Value: value, Args: args}
+  }
+  statement:Statement {
+    varDecl(t string, name string, value expr) => VarDecl{Loc: loc_start, T: t, Name: name, Value: value}
+    assign(name string, value expr) => Assign{Loc: loc_start, Name: name, Value: value}
+    discard(value expr) => Discard{Loc: loc_start, Value: value}
+  }
+  shaderDecl:ShaderDecl {
+    default(name string, vs []statement, fs []statement) => ShaderDecl{Loc: loc_start, Name: name, Vs: vs, Fs: fs}
+  }
+  file:File {
+    default(shaders []shaderDecl) => File{Loc: loc_start, Shaders: shaders}
+  }
 }

@@ -96,8 +96,8 @@ type ShaderDecl struct {
 	Loc  util.Location
 	Temp interface{}
 	Name string
-	Fs   []Statement
 	Vs   []Statement
+	Fs   []Statement
 }
 
 type File struct {
@@ -193,8 +193,8 @@ func (c *ASTConverter) ConvertShaderDecl(ctx parser.IShaderDeclContext) *ShaderD
 		return &ShaderDecl{
 			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
 			Name: ctx.GetName().GetText(),
-			Fs:   c.ConvertStatementList(ctx.GetFs()),
 			Vs:   c.ConvertStatementList(ctx.GetVs()),
+			Fs:   c.ConvertStatementList(ctx.GetFs()),
 		}
 	default:
 		panic(ctx)
@@ -219,12 +219,4 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	default:
 		panic(ctx)
 	}
-}
-
-func (c *ASTConverter) ConvertFileList(src []parser.IFileContext) []*File {
-	dst := make([]*File, len(src))
-	for i, child := range src {
-		dst[i] = c.ConvertFile(child)
-	}
-	return dst
 }
