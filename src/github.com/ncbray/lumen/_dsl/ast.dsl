@@ -1,6 +1,6 @@
 enum Expr {
   GetName {
-    var Raw string;
+    var Name string;
   }
   Number {
     var Raw string;

@@ -14,7 +14,7 @@ expr
   | left=expr op='&&' right=expr # infix
   | left=expr op='||' right=expr # infix
   | value=expr '(' (args+=expr (',' args+=expr)*)? ')' # call
-  | raw=ID # getName
+  | name=ID # getName
   | raw=NUM # number
   ;
 

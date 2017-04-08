@@ -9,6 +9,7 @@ import (
 	"github.com/ncbray/lumen/ast"
 	"github.com/ncbray/lumen/log"
 	"github.com/ncbray/lumen/parser"
+	"github.com/ncbray/lumen/resolved"
 	"github.com/ncbray/lumen/util"
 )
 
@@ -63,7 +64,11 @@ func run() bool {
 	defer tdir.Cleanup()
 	fsys := fs.MakeBufferedFileSystem(tdir)
 
-	parseFile(input, fsys, logger)
+	file := parseFile(input, fsys, logger)
+	if logger.NumErrors() > 0 {
+		return false
+	}
+	resolved.FromAST(file, logger)
 	if logger.NumErrors() > 0 {
 		return false
 	}

@@ -106,6 +106,7 @@ func run() bool {
 			ParserPackage: "github.com/ncbray/lumen/parser",
 			Files: []string{
 				"ast.dsl",
+				"resolved.dsl",
 			},
 		},
 	}

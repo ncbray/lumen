@@ -12,7 +12,7 @@ type Expr interface {
 type GetName struct {
 	Loc  util.Location
 	Temp interface{}
-	Raw  string
+	Name string
 }
 
 func (n *GetName) isExpr() {
@@ -114,8 +114,8 @@ func (c *ASTConverter) ConvertExpr(ctx parser.IExprContext) Expr {
 	switch ctx := ctx.(type) {
 	case *parser.GetNameContext:
 		return &GetName{
-			Loc: util.GetLocation(c.Filename, ctx.GetStart()),
-			Raw: ctx.GetRaw().GetText(),
+			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
+			Name: ctx.GetName().GetText(),
 		}
 	case *parser.NumberContext:
 		return &Number{

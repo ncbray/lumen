@@ -318,7 +318,7 @@ func (s *NumberContext) ExitRule(listener antlr.ParseTreeListener) {
 
 type GetNameContext struct {
 	*ExprContext
-	raw antlr.Token
+	name antlr.Token
 }
 
 func NewGetNameContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *GetNameContext {
@@ -331,9 +331,9 @@ func NewGetNameContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *GetNam
 	return p
 }
 
-func (s *GetNameContext) GetRaw() antlr.Token { return s.raw }
+func (s *GetNameContext) GetName() antlr.Token { return s.name }
 
-func (s *GetNameContext) SetRaw(v antlr.Token) { s.raw = v }
+func (s *GetNameContext) SetName(v antlr.Token) { s.name = v }
 
 func (s *GetNameContext) GetRuleContext() antlr.RuleContext {
 	return s
@@ -548,7 +548,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 
 			var _m = p.Match(LumenParserID)
 
-			localctx.(*GetNameContext).raw = _m
+			localctx.(*GetNameContext).name = _m
 		}
 
 	case LumenParserNUM:
