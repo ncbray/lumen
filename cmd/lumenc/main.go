@@ -39,22 +39,38 @@ func parseFile(filename string, fsys fs.FileSystem, logger log.CompilerLogger) *
 }
 
 func run() bool {
-	var pkg string
 	var input string
+	var pkg string
+	var target string
+	var output string
 
 	inputFile := &cmdline.FilePath{
 		MustExist: true,
 	}
 
+	targetEnum := &cmdline.Enum{Possible: []string{"android", "html5", "ios", "linux", "mac", "windows"}}
+
+	outputFile := &cmdline.FilePath{
+		MustExist: false,
+	}
+
 	app := cmdline.MakeApp("lumenc")
 	app.RequiredArgs([]*cmdline.Argument{
+		{
+			Name:  "input",
+			Value: inputFile.Set(&input),
+		},
+		{
+			Name:  "target",
+			Value: targetEnum.Set(&target),
+		},
 		{
 			Name:  "package",
 			Value: cmdline.String.Set(&pkg),
 		},
 		{
-			Name:  "input",
-			Value: inputFile.Set(&input),
+			Name:  "output",
+			Value: outputFile.Set(&output),
 		},
 	})
 	app.Run(os.Args[1:])
@@ -78,7 +94,14 @@ func run() bool {
 		return false
 	}
 
-	resolved.GenerateHaxe(pkg, rfile, true, os.Stdout)
+	out := fsys.OutputFile(output, 0644)
+	ow, err := out.GetWriter()
+	if err != nil {
+		logger.Error(err.Error())
+		return false
+	}
+	defer ow.Close()
+	resolved.GenerateHaxe(pkg, rfile, target == "android" || target == "html5" || target == "ios", ow)
 
 	fsys.Commit()
 	return true
