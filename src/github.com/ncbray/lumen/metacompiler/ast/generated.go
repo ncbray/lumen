@@ -5,10 +5,6 @@ import (
 	"github.com/ncbray/lumen/util"
 )
 
-type TypeRef interface {
-	isTypeRef()
-}
-
 type TypeName struct {
 	Loc  util.Location
 	Temp interface{}
@@ -27,8 +23,8 @@ type ListRef struct {
 func (n *ListRef) isTypeRef() {
 }
 
-type MemberDecl interface {
-	isMemberDecl()
+type TypeRef interface {
+	isTypeRef()
 }
 
 type FieldDecl struct {
@@ -41,11 +37,8 @@ type FieldDecl struct {
 func (n *FieldDecl) isMemberDecl() {
 }
 
-type VariantDecl struct {
-	Loc     util.Location
-	Temp    interface{}
-	Name    string
-	Members []MemberDecl
+type MemberDecl interface {
+	isMemberDecl()
 }
 
 type KeywordArg struct {
@@ -53,10 +46,6 @@ type KeywordArg struct {
 	Temp  interface{}
 	Name  string
 	Value ParserBindingExpr
-}
-
-type ParserBindingExpr interface {
-	isParserBindingExpr()
 }
 
 type Construct struct {
@@ -76,6 +65,10 @@ type NameRef struct {
 }
 
 func (n *NameRef) isParserBindingExpr() {
+}
+
+type ParserBindingExpr interface {
+	isParserBindingExpr()
 }
 
 type ParamDecl struct {
@@ -99,20 +92,6 @@ type ParserBindingGroup struct {
 	Name     string
 	T        TypeRef
 	Mappings []*ParserBindingMapping
-}
-
-type Declaration interface {
-	isDeclaration()
-}
-
-type EnumDecl struct {
-	Loc      util.Location
-	Temp     interface{}
-	Name     string
-	Variants []*VariantDecl
-}
-
-func (n *EnumDecl) isDeclaration() {
 }
 
 type StructDecl struct {
@@ -142,6 +121,10 @@ type ParserBindingDecl struct {
 }
 
 func (n *ParserBindingDecl) isDeclaration() {
+}
+
+type Declaration interface {
+	isDeclaration()
 }
 
 type File struct {
@@ -196,27 +179,6 @@ func (c *ASTConverter) ConvertMemberDeclList(src []parser.IMemberDeclContext) []
 	dst := make([]MemberDecl, len(src))
 	for i, child := range src {
 		dst[i] = c.ConvertMemberDecl(child)
-	}
-	return dst
-}
-
-func (c *ASTConverter) ConvertVariantDecl(ctx parser.IVariantDeclContext) *VariantDecl {
-	switch ctx := ctx.(type) {
-	case *parser.VariantDeclContext:
-		return &VariantDecl{
-			Loc:     util.GetLocation(c.Filename, ctx.GetStart()),
-			Name:    ctx.GetName().GetText(),
-			Members: c.ConvertMemberDeclList(ctx.GetMembers()),
-		}
-	default:
-		panic(ctx)
-	}
-}
-
-func (c *ASTConverter) ConvertVariantDeclList(src []parser.IVariantDeclContext) []*VariantDecl {
-	dst := make([]*VariantDecl, len(src))
-	for i, child := range src {
-		dst[i] = c.ConvertVariantDecl(child)
 	}
 	return dst
 }
@@ -327,12 +289,6 @@ func (c *ASTConverter) ConvertParserBindingGroupList(src []parser.IParserBinding
 
 func (c *ASTConverter) ConvertDeclaration(ctx parser.IDeclarationContext) Declaration {
 	switch ctx := ctx.(type) {
-	case *parser.EnumDeclContext:
-		return &EnumDecl{
-			Loc:      util.GetLocation(c.Filename, ctx.GetStart()),
-			Name:     ctx.GetName().GetText(),
-			Variants: c.ConvertVariantDeclList(ctx.GetVariants()),
-		}
 	case *parser.StructDeclContext:
 		return &StructDecl{
 			Loc:     util.GetLocation(c.Filename, ctx.GetStart()),

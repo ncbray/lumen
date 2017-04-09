@@ -1,56 +1,64 @@
-enum Type {
-  Intrinsic {
-    var Name string;
-  }
+struct Intrinsic {
+  var Name string;
 }
+
+holder Type = Intrinsic;
 
 struct Local {
   var Name string;
   var Type Type;
 }
 
-enum Expr {
-  GetInput {
-    var Name string;
-  }
-  GetLocal {
-    var Local Local;
-  }
-  Number {
-    var Raw string;
-  }
-  Prefix {
-    var Op string;
-    var Value Expr;
-  }
-  Infix {
-    var Left Expr;
-    var Op string;
-    var Right Expr;
-  }
-  Constructor {
-    var Type Type;
-    var Args []Expr;
-  }
-  CallIntrinsic {
-    var Name string;
-    var Args []Expr;
-  }
+struct GetInput {
+  var Name string;
 }
 
-enum Statement {
-  SetOutput {
-    var Name string;
-    var Value Expr;
-  }
-  SetLocal {
-    var Local Local;
-    var Value Expr;
-  }
-  Discard {
-    var Value Expr;
-  }
+struct GetLocal {
+  var Local Local;
 }
+
+struct Number {
+  var Raw string;
+}
+
+struct Prefix {
+  var Op string;
+  var Value Expr;
+}
+
+struct Infix {
+  var Left Expr;
+  var Op string;
+  var Right Expr;
+}
+
+struct Constructor {
+  var Type Type;
+  var Args []Expr;
+}
+
+struct CallIntrinsic {
+  var Name string;
+  var Args []Expr;
+}
+
+holder Expr = GetInput | GetLocal | Number | Prefix | Infix | Constructor | CallIntrinsic;
+
+struct SetOutput {
+  var Name string;
+  var Value Expr;
+}
+
+struct SetLocal {
+  var Local Local;
+  var Value Expr;
+}
+
+struct Discard {
+  var Value Expr;
+}
+
+holder Statement = SetOutput | SetLocal | Discard;
 
 struct Function {
   var Name string;

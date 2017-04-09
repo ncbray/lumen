@@ -32,12 +32,7 @@ func (ns *namespace) ResolveType(name string) Type {
 
 func listOfType(t Type) Type {
 	switch t := t.(type) {
-	case *Intrinsic:
-		if t.List == nil {
-			t.List = &List{Element: t}
-		}
-		return t.List
-	case *Enum:
+	case *IntrinsicType:
 		if t.List == nil {
 			t.List = &List{Element: t}
 		}
@@ -171,22 +166,20 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 				Value: value,
 			})
 		}
-		/*
-			t := ns.ResolveType(e.Name)
-			if t == nil {
-				loc := e.Loc
-				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown type %q.", e.Name))
-				return nil, nil
-			}
-			st, ok := t.(*Struct)
-			if !ok {
-				loc := e.Loc
-				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Can only construct structures.")
-				return nil, nil
-			}
-		*/
+		t := ns.ResolveType(e.Name)
+		if t == nil {
+			loc := e.Loc
+			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown type %q.", e.Name))
+			return nil
+		}
+		st, ok := t.(*Struct)
+		if !ok {
+			loc := e.Loc
+			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Can only construct structures.")
+			return nil
+		}
 		return &Construct{
-			Type: e.Name,
+			Type: st,
 			Args: args,
 		}
 	default:
@@ -198,8 +191,8 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	builtins := &namespace{
 		parent: nil,
 		types: map[string]Type{
-			"string": &Intrinsic{Name: "string"},
-			"bool":   &Intrinsic{Name: "bool"},
+			"string": &IntrinsicType{Name: "string"},
+			"bool":   &IntrinsicType{Name: "bool"},
 		},
 	}
 	ns := &namespace{
@@ -211,29 +204,6 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	var parserBinding *ParserBinding
 	for _, d := range src.Decls {
 		switch d := d.(type) {
-		case *ast.EnumDecl:
-			if ns.IsDefined(d.Name) {
-				loc := d.Loc
-				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Attempted to redefine %q.", d.Name))
-				continue
-			}
-			t := &Enum{
-				Name: d.Name,
-			}
-			ns.Define(d.Name, t)
-			types = append(types, t)
-			d.Temp = t
-
-			// TODO check variant names.
-			variants := make([]*Variant, len(d.Variants))
-			for i, v := range d.Variants {
-				vt := &Variant{
-					Name: v.Name,
-				}
-				variants[i] = vt
-				v.Temp = vt
-			}
-			t.Variants = variants
 		case *ast.StructDecl:
 			if ns.IsDefined(d.Name) {
 				loc := d.Loc
@@ -279,13 +249,6 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	// Resolve fields
 	for _, d := range src.Decls {
 		switch d := d.(type) {
-		case *ast.EnumDecl:
-			//e := d.Temp.(*Enum)
-			for _, v := range d.Variants {
-				vt := v.Temp.(*Variant)
-				vt.Fields = resolveMembers("variant "+d.Name+"::"+v.Name, v.Members, ns, logger)
-			}
-
 		case *ast.StructDecl:
 			s := d.Temp.(*Struct)
 			s.Fields = resolveMembers("struct "+d.Name, d.Members, ns, logger)
@@ -332,7 +295,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	// Resolve function bodies.
 	for _, d := range src.Decls {
 		switch d := d.(type) {
-		case *ast.EnumDecl, *ast.StructDecl, *ast.HolderDecl:
+		case *ast.StructDecl, *ast.HolderDecl:
 		case *ast.ParserBindingDecl:
 			//b := d.Temp.(*ParserBinding)
 

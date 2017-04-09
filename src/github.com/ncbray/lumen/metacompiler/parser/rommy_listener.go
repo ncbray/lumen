@@ -17,9 +17,6 @@ type RommyListener interface {
 	// EnterFieldDecl is called when entering the fieldDecl production.
 	EnterFieldDecl(c *FieldDeclContext)
 
-	// EnterVariantDecl is called when entering the variantDecl production.
-	EnterVariantDecl(c *VariantDeclContext)
-
 	// EnterKeywordArg is called when entering the keywordArg production.
 	EnterKeywordArg(c *KeywordArgContext)
 
@@ -37,9 +34,6 @@ type RommyListener interface {
 
 	// EnterParserBindingGroup is called when entering the parserBindingGroup production.
 	EnterParserBindingGroup(c *ParserBindingGroupContext)
-
-	// EnterEnumDecl is called when entering the enumDecl production.
-	EnterEnumDecl(c *EnumDeclContext)
 
 	// EnterStructDecl is called when entering the structDecl production.
 	EnterStructDecl(c *StructDeclContext)
@@ -65,9 +59,6 @@ type RommyListener interface {
 	// ExitFieldDecl is called when exiting the fieldDecl production.
 	ExitFieldDecl(c *FieldDeclContext)
 
-	// ExitVariantDecl is called when exiting the variantDecl production.
-	ExitVariantDecl(c *VariantDeclContext)
-
 	// ExitKeywordArg is called when exiting the keywordArg production.
 	ExitKeywordArg(c *KeywordArgContext)
 
@@ -85,9 +76,6 @@ type RommyListener interface {
 
 	// ExitParserBindingGroup is called when exiting the parserBindingGroup production.
 	ExitParserBindingGroup(c *ParserBindingGroupContext)
-
-	// ExitEnumDecl is called when exiting the enumDecl production.
-	ExitEnumDecl(c *EnumDeclContext)
 
 	// ExitStructDecl is called when exiting the structDecl production.
 	ExitStructDecl(c *StructDeclContext)

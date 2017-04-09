@@ -1,9 +1,5 @@
 package resolved
 
-type Type interface {
-	isType()
-}
-
 type Intrinsic struct {
 	Name string
 }
@@ -11,13 +7,13 @@ type Intrinsic struct {
 func (n *Intrinsic) isType() {
 }
 
+type Type interface {
+	isType()
+}
+
 type Local struct {
 	Name string
 	Type Type
-}
-
-type Expr interface {
-	isExpr()
 }
 
 type GetInput struct {
@@ -74,8 +70,8 @@ type CallIntrinsic struct {
 func (n *CallIntrinsic) isExpr() {
 }
 
-type Statement interface {
-	isStatement()
+type Expr interface {
+	isExpr()
 }
 
 type SetOutput struct {
@@ -99,6 +95,10 @@ type Discard struct {
 }
 
 func (n *Discard) isStatement() {
+}
+
+type Statement interface {
+	isStatement()
 }
 
 type Function struct {

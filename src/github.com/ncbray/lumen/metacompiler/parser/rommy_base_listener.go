@@ -39,12 +39,6 @@ func (s *BaseRommyListener) EnterFieldDecl(ctx *FieldDeclContext) {}
 // ExitFieldDecl is called when production fieldDecl is exited.
 func (s *BaseRommyListener) ExitFieldDecl(ctx *FieldDeclContext) {}
 
-// EnterVariantDecl is called when production variantDecl is entered.
-func (s *BaseRommyListener) EnterVariantDecl(ctx *VariantDeclContext) {}
-
-// ExitVariantDecl is called when production variantDecl is exited.
-func (s *BaseRommyListener) ExitVariantDecl(ctx *VariantDeclContext) {}
-
 // EnterKeywordArg is called when production keywordArg is entered.
 func (s *BaseRommyListener) EnterKeywordArg(ctx *KeywordArgContext) {}
 
@@ -80,12 +74,6 @@ func (s *BaseRommyListener) EnterParserBindingGroup(ctx *ParserBindingGroupConte
 
 // ExitParserBindingGroup is called when production parserBindingGroup is exited.
 func (s *BaseRommyListener) ExitParserBindingGroup(ctx *ParserBindingGroupContext) {}
-
-// EnterEnumDecl is called when production enumDecl is entered.
-func (s *BaseRommyListener) EnterEnumDecl(ctx *EnumDeclContext) {}
-
-// ExitEnumDecl is called when production enumDecl is exited.
-func (s *BaseRommyListener) ExitEnumDecl(ctx *EnumDeclContext) {}
 
 // EnterStructDecl is called when production structDecl is entered.
 func (s *BaseRommyListener) EnterStructDecl(ctx *StructDeclContext) {}

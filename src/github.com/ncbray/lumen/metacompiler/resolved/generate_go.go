@@ -14,14 +14,12 @@ type generateGoStructs struct {
 
 func (g *generateGoStructs) genStructTypeRef(t Type) {
 	switch t := t.(type) {
-	case *Intrinsic:
+	case *IntrinsicType:
 		g.out.WriteString(t.Name)
 	case *Struct:
 		g.out.WriteString("*")
 		g.out.WriteString(t.Name)
 	case *Holder:
-		g.out.WriteString(t.Name)
-	case *Enum:
 		g.out.WriteString(t.Name)
 	case *List:
 		g.out.WriteString("[]")
@@ -42,35 +40,6 @@ func (g *generateGoStructs) genStructField(f *Field) {
 func (g *generateGoStructs) genStructFile(file *File) {
 	for _, d := range file.Types {
 		switch d := d.(type) {
-		case *Enum:
-			g.out.EndOfLine()
-			g.out.WriteLine("type " + d.Name + " interface {")
-			g.out.Indent()
-			g.out.WriteLine("is" + d.Name + "()")
-			g.out.Dedent()
-			g.out.WriteLine("}")
-
-			for _, v := range d.Variants {
-				g.out.EndOfLine()
-				g.out.WriteLine("type " + v.Name + " struct {")
-				g.out.Indent()
-				if g.isAst {
-					g.out.WriteLine("Loc util.Location")
-					// HACK to make translation simpler.
-					g.out.WriteLine("Temp interface{}")
-				}
-				for _, f := range v.Fields {
-					g.genStructField(f)
-				}
-				g.out.Dedent()
-				g.out.WriteLine("}")
-
-				g.out.EndOfLine()
-				g.out.WriteLine("func (n *" + v.Name + ") is" + d.Name + "() {")
-				g.out.Indent()
-				g.out.Dedent()
-				g.out.WriteLine("}")
-			}
 		case *Holder:
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " interface {")
@@ -127,7 +96,7 @@ func (g *generateGoStructs) genBindingExpr(e ParserBindingExpr) {
 			panic(i)
 		}
 	case *Construct:
-		g.out.WriteString("&" + e.Type + " {")
+		g.out.WriteString("&" + e.Type.Name + " {")
 		if len(e.Args) > 0 {
 			g.out.EndOfLine()
 			g.out.Indent()

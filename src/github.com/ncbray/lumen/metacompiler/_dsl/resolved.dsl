@@ -3,39 +3,30 @@ struct Field {
   var Type Type;
 }
 
-struct Variant {
+struct IntrinsicType {
   var Name string;
-  var Fields []Field;
-}
-
-struct Intrinsic {
-  var Name string;
-  var List Type;
-}
-
-struct Enum {
-  var Name string;
-  var Variants []Variant;
-  var List Type;
+  var List List;
 }
 
 struct Struct {
   var Name string;
   var Fields []Field;
   var Holders []Holder;
-  var List Type;
+  var List List;
 }
 
 struct Holder {
   var Name string;
   var Types []Struct;
-  var List Type;
+  var List List;
 }
 
 struct List {
   var Element Type;
-  var List Type;
+  var List List;
 }
+
+holder Type = IntrinsicType | Struct | Holder | List;
 
 struct KeywordArg {
   var Name string;
@@ -43,8 +34,7 @@ struct KeywordArg {
 }
 
 struct Construct {
-  // TODO directly ref Type object once enums are eliminated.
-  var Type string;
+  var Type Struct;
   var Args []KeywordArg;
 }
 
@@ -55,11 +45,7 @@ struct GetParam {
 struct GetLocStart {
 }
 
-holder ParserBindingExpr {
-  Construct;
-  GetParam;
-  GetLocStart;
-}
+holder ParserBindingExpr = Construct | GetParam | GetLocStart;
 
 struct InputList {
   var Element ParserBindingGroup;
@@ -68,11 +54,7 @@ struct InputList {
 struct InputSlice {
 }
 
-holder ParserBindingInput {
-  ParserBindingGroup;
-  InputList;
-  InputSlice;
-}
+holder ParserBindingInput = ParserBindingGroup | InputList | InputSlice;
 
 struct ParserBindingParam {
   var Name string;
@@ -94,14 +76,6 @@ struct ParserBindingGroup {
 
 struct ParserBinding {
   var Groups []ParserBindingGroup;
-}
-
-holder Type {
-  Intrinsic;
-  Enum;
-  Struct;
-  Holder;
-  List;
 }
 
 // Index of what should be output

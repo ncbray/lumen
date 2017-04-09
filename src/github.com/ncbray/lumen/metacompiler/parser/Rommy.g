@@ -11,10 +11,6 @@ memberDecl
   : 'var' name=ID t=typeRef ';' # fieldDecl
   ;
 
-variantDecl
-  : name=ID '{' (members+=memberDecl)* '}'
-  ;
-
 keywordArg
   : name=ID ':' value=parserBindingExpr
   ;
@@ -37,9 +33,8 @@ parserBindingGroup
   ;
 
 declaration
-  : 'enum' name=ID '{' (variants+=variantDecl)* '}' # enumDecl
-  | 'struct' name=ID '{' (members+=memberDecl)* '}' # structDecl
-  | 'holder' name=ID '{' (types+=typeRef ';')* '}' # holderDecl
+  : 'struct' name=ID '{' (members+=memberDecl)* '}' # structDecl
+  | 'holder' name=ID '=' (types+=typeRef ('|' types+=typeRef)*)? ';' # holderDecl
   | 'region' name=ID '{' (decls+=declaration)* '}' # regionDecl
   | 'parser' '{' (groups+=parserBindingGroup)* '}' # parserBindingDecl
   ;

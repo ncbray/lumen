@@ -1,39 +1,46 @@
-enum Expr {
-  GetName {
-    var Name string;
-  }
-  Number {
-    var Raw string;
-  }
-  Prefix {
-    var Op string;
-    var Value Expr;
-  }
-  Infix {
-    var Left Expr;
-    var Op string;
-    var Right Expr;
-  }
-  Call {
-    var Value Expr;
-    var Args []Expr;
-  }
+struct GetName {
+  var Name string;
 }
 
-enum Statement {
-  VarDecl {
-    var T string;
-    var Name string;
-    var Value Expr;
-  }
-  Assign {
-    var Name string;
-    var Value Expr;
-  }
-  Discard {
-    var Value Expr;
-  }
+struct Number {
+  var Raw string;
 }
+
+struct Prefix {
+  var Op string;
+  var Value Expr;
+}
+
+struct Infix {
+  var Left Expr;
+  var Op string;
+  var Right Expr;
+}
+
+struct Call {
+  var Value Expr;
+  var Args []Expr;
+}
+
+holder Expr = GetName | Number | Prefix | Infix | Call;
+
+
+struct VarDecl {
+  var T string;
+  var Name string;
+  var Value Expr;
+}
+
+struct Assign {
+  var Name string;
+  var Value Expr;
+}
+
+struct Discard {
+  var Value Expr;
+}
+
+holder Statement = VarDecl | Assign | Discard;
 
 struct ShaderDecl {
   var Name string;

@@ -5,33 +5,19 @@ type Field struct {
 	Type Type
 }
 
-type Variant struct {
-	Name   string
-	Fields []*Field
-}
-
-type Intrinsic struct {
+type IntrinsicType struct {
 	Name string
-	List Type
+	List *List
 }
 
-func (n *Intrinsic) isType() {
-}
-
-type Enum struct {
-	Name     string
-	Variants []*Variant
-	List     Type
-}
-
-func (n *Enum) isType() {
+func (n *IntrinsicType) isType() {
 }
 
 type Struct struct {
 	Name    string
 	Fields  []*Field
 	Holders []*Holder
-	List    Type
+	List    *List
 }
 
 func (n *Struct) isType() {
@@ -40,7 +26,7 @@ func (n *Struct) isType() {
 type Holder struct {
 	Name  string
 	Types []*Struct
-	List  Type
+	List  *List
 }
 
 func (n *Holder) isType() {
@@ -48,10 +34,14 @@ func (n *Holder) isType() {
 
 type List struct {
 	Element Type
-	List    Type
+	List    *List
 }
 
 func (n *List) isType() {
+}
+
+type Type interface {
+	isType()
 }
 
 type KeywordArg struct {
@@ -60,7 +50,7 @@ type KeywordArg struct {
 }
 
 type Construct struct {
-	Type string
+	Type *Struct
 	Args []*KeywordArg
 }
 
@@ -124,10 +114,6 @@ func (n *ParserBindingGroup) isParserBindingInput() {
 
 type ParserBinding struct {
 	Groups []*ParserBindingGroup
-}
-
-type Type interface {
-	isType()
 }
 
 type File struct {

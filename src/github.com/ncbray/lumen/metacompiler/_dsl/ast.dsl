@@ -1,39 +1,35 @@
-enum TypeRef {
-  TypeName {
-    var Name string;
-  }
-  ListRef {
-    var Element TypeRef;
-  }
-}
-
-enum MemberDecl {
-  FieldDecl {
-    var Name string;
-    var T TypeRef;
-  }
-}
-
-struct VariantDecl {
+struct TypeName {
   var Name string;
-  var Members []MemberDecl;
 }
 
+struct ListRef {
+  var Element TypeRef;
+}
+
+holder TypeRef = TypeName | ListRef;
+
+struct FieldDecl {
+  var Name string;
+  var T TypeRef;
+}
+
+holder MemberDecl = FieldDecl;
 
 struct KeywordArg {
   var Name string;
   var Value ParserBindingExpr;
 }
 
-enum ParserBindingExpr {
-  Construct {
-    var Name string;
-    var Args []KeywordArg;
-  }
-  NameRef {
-    var Name string;
-  }
+struct Construct {
+  var Name string;
+  var Args []KeywordArg;
 }
+
+struct NameRef {
+  var Name string;
+}
+
+holder ParserBindingExpr = Construct | NameRef;
 
 struct ParamDecl {
   var Name string;
@@ -52,24 +48,22 @@ struct ParserBindingGroup {
   var Mappings []ParserBindingMapping;
 }
 
-// Top-level declarations
-enum Declaration {
-  EnumDecl {
-    var Name string;
-    var Variants []VariantDecl;
-  }
-  StructDecl {
-    var Name string;
-    var Members []MemberDecl;
-  }
-  HolderDecl {
-    var Name string;
-    var Types []TypeRef;
-  }
-  ParserBindingDecl {
-    var Groups []ParserBindingGroup;
-  }
+struct StructDecl {
+  var Name string;
+  var Members []MemberDecl;
 }
+
+struct HolderDecl {
+  var Name string;
+  var Types []TypeRef;
+}
+
+struct ParserBindingDecl {
+  var Groups []ParserBindingGroup;
+}
+
+// Top-level declarations
+holder Declaration = StructDecl | HolderDecl | ParserBindingDecl;
 
 // Compilation unit
 struct File {
@@ -84,9 +78,6 @@ parser {
   }
   memberDecl:MemberDecl {
     fieldDecl(name string, t typeRef) => FieldDecl{Loc: loc_start, Name: name, T: t}
-  }
-  variantDecl:VariantDecl {
-    default(name string, members []memberDecl) => VariantDecl{Loc: loc_start, Name: name, Members: members}
   }
   keywordArg:KeywordArg {
     default(name string, value parserBindingExpr) => KeywordArg{Loc: loc_start, Name: name, Value: value}
@@ -105,7 +96,6 @@ parser {
     default(name string, t typeRef, mappings []parserBindingMapping) => ParserBindingGroup{Loc: loc_start, Name: name, T: t, Mappings: mappings}
   }
   declaration:Declaration {
-    enumDecl(name string, variants []variantDecl) => EnumDecl{Loc: loc_start, Name: name, Variants: variants}
     structDecl(name string, members []memberDecl) => StructDecl{Loc: loc_start, Name: name, Members: members}
     holderDecl(name string, types []typeRef) => HolderDecl{Loc: loc_start, Name: name, Types: types}
     parserBindingDecl(groups []parserBindingGroup) => ParserBindingDecl{Loc: loc_start, Groups: groups}

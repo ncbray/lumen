@@ -5,10 +5,6 @@ import (
 	"github.com/ncbray/lumen/util"
 )
 
-type Expr interface {
-	isExpr()
-}
-
 type GetName struct {
 	Loc  util.Location
 	Temp interface{}
@@ -58,8 +54,8 @@ type Call struct {
 func (n *Call) isExpr() {
 }
 
-type Statement interface {
-	isStatement()
+type Expr interface {
+	isExpr()
 }
 
 type VarDecl struct {
@@ -90,6 +86,10 @@ type Discard struct {
 }
 
 func (n *Discard) isStatement() {
+}
+
+type Statement interface {
+	isStatement()
 }
 
 type ShaderDecl struct {
