@@ -158,14 +158,6 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 		}
 		panic(e.Name)
 	case *ast.Construct:
-		args := []*KeywordArg{}
-		for _, arg := range e.Args {
-			value := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
-			args = append(args, &KeywordArg{
-				Name:  arg.Name,
-				Value: value,
-			})
-		}
 		t := ns.ResolveType(e.Name)
 		if t == nil {
 			loc := e.Loc
@@ -177,6 +169,25 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 			loc := e.Loc
 			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Can only construct structures.")
 			return nil
+		}
+
+		fieldLUT := map[string]*Field{}
+		for _, f := range st.Fields {
+			fieldLUT[f.Name] = f
+		}
+
+		args := []*FieldArg{}
+		for _, arg := range e.Args {
+			f, ok := fieldLUT[arg.Name]
+			if !ok {
+				loc := e.Loc
+				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown field %s.%s", st.Name, arg.Name))
+			}
+			value := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
+			args = append(args, &FieldArg{
+				Field: f,
+				Value: value,
+			})
 		}
 		return &Construct{
 			Type: st,

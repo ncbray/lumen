@@ -28,14 +28,14 @@ struct List {
 
 holder Type = IntrinsicType | Struct | Holder | List;
 
-struct KeywordArg {
-  var Name string;
+struct FieldArg {
+  var Field Field;
   var Value ParserBindingExpr;
 }
 
 struct Construct {
   var Type Struct;
-  var Args []KeywordArg;
+  var Args []FieldArg;
 }
 
 struct GetParam {

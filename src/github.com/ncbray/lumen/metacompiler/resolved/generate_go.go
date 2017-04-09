@@ -114,14 +114,15 @@ func (g *generateGoStructs) genBindingExpr(e ParserBindingExpr) {
 			g.out.Indent()
 			longestName := 0
 			for _, a := range e.Args {
-				l := len(a.Name)
+				l := len(a.Field.Name)
 				if l > longestName {
 					longestName = l
 				}
 			}
 
 			for _, a := range e.Args {
-				g.out.WriteString(a.Name + ":" + strings.Repeat(" ", longestName-len(a.Name)+1))
+				fn := a.Field.Name
+				g.out.WriteString(fn + ":" + strings.Repeat(" ", longestName-len(fn)+1))
 				g.genBindingExpr(a.Value)
 				g.out.WriteString(",")
 				g.out.EndOfLine()

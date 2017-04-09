@@ -49,16 +49,16 @@ type Type interface {
 	isType()
 }
 
-type KeywordArg struct {
+type FieldArg struct {
 	Temp  interface{}
-	Name  string
+	Field *Field
 	Value ParserBindingExpr
 }
 
 type Construct struct {
 	Temp interface{}
 	Type *Struct
-	Args []*KeywordArg
+	Args []*FieldArg
 }
 
 func (n *Construct) isParserBindingExpr() {
