@@ -44,7 +44,6 @@ struct Assign {
 }
 
 struct Discard {
-  var Loc location;
   var Value Expr;
 }
 
@@ -58,7 +57,6 @@ struct ShaderDecl {
 }
 
 struct File {
-  var Loc location;
   var Shaders []ShaderDecl;
 }
 
@@ -73,12 +71,12 @@ parser {
   statement:Statement {
     varDecl(t string, name string, value expr) => VarDecl{Loc: loc_start, T: t, Name: name, Value: value}
     assign(name string, value expr) => Assign{Loc: loc_start, Name: name, Value: value}
-    discard(value expr) => Discard{Loc: loc_start, Value: value}
+    discard(value expr) => Discard{Value: value}
   }
   shaderDecl:ShaderDecl {
     default(name string, vs []statement, fs []statement) => ShaderDecl{Loc: loc_start, Name: name, Vs: vs, Fs: fs}
   }
   file:File {
-    default(shaders []shaderDecl) => File{Loc: loc_start, Shaders: shaders}
+    default(shaders []shaderDecl) => File{Shaders: shaders}
   }
 }

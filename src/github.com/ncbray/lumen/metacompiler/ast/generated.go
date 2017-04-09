@@ -129,7 +129,6 @@ type Declaration interface {
 
 type File struct {
 	Temp  interface{}
-	Loc   util.Location
 	Decls []Declaration
 }
 
@@ -323,7 +322,6 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	switch ctx := ctx.(type) {
 	case *parser.FileContext:
 		return &File{
-			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
 			Decls: c.ConvertDeclarationList(ctx.GetDecls()),
 		}
 	default:

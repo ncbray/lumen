@@ -79,7 +79,6 @@ holder Declaration = StructDecl | HolderDecl | ParserBindingDecl;
 
 // Compilation unit
 struct File {
-  var Loc location;
   var Decls []Declaration;
 }
 
@@ -114,6 +113,6 @@ parser {
     parserBindingDecl(groups []parserBindingGroup) => ParserBindingDecl{Loc: loc_start, Groups: groups}
   }
   file:File {
-    default(decls []declaration) => File{Loc: loc_start, Decls: decls}
+    default(decls []declaration) => File{Decls: decls}
   }
 }

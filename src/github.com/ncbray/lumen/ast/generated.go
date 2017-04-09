@@ -81,7 +81,6 @@ func (n *Assign) isStatement() {
 
 type Discard struct {
 	Temp  interface{}
-	Loc   util.Location
 	Value Expr
 }
 
@@ -102,7 +101,6 @@ type ShaderDecl struct {
 
 type File struct {
 	Temp    interface{}
-	Loc     util.Location
 	Shaders []*ShaderDecl
 }
 
@@ -171,7 +169,6 @@ func (c *ASTConverter) ConvertStatement(ctx parser.IStatementContext) Statement 
 		}
 	case *parser.DiscardContext:
 		return &Discard{
-			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
 			Value: c.ConvertExpr(ctx.GetValue()),
 		}
 	default:
@@ -213,7 +210,6 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	switch ctx := ctx.(type) {
 	case *parser.FileContext:
 		return &File{
-			Loc:     util.GetLocation(c.Filename, ctx.GetStart()),
 			Shaders: c.ConvertShaderDeclList(ctx.GetShaders()),
 		}
 	default:
