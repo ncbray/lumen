@@ -1,8 +1,8 @@
-struct Intrinsic {
+struct IntrinsicType {
   var Name string;
 }
 
-holder Type = Intrinsic;
+holder Type = IntrinsicType;
 
 struct Local {
   var Name string;

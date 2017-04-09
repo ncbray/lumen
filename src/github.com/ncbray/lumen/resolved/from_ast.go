@@ -11,7 +11,7 @@ type astConverter struct {
 	Logger     log.CompilerLogger
 	LocalLut   map[string]*Local
 	Locals     []*Local
-	Intrinsics map[string]*Intrinsic
+	Intrinsics map[string]*IntrinsicType
 }
 
 func (conv *astConverter) handleExpr(src ast.Expr, logger log.CompilerLogger) Expr {
@@ -92,7 +92,7 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	c := astConverter{
 		Logger: logger,
-		Intrinsics: map[string]*Intrinsic{
+		Intrinsics: map[string]*IntrinsicType{
 			"vec2": {Name: "vec2"},
 			"vec3": {Name: "vec3"},
 			"vec4": {Name: "vec4"},

@@ -30,9 +30,9 @@ func (g *generateGoStructs) genStructTypeRef(t Type) {
 
 }
 
-func (g *generateGoStructs) genStructField(f *Field) {
+func (g *generateGoStructs) genStructField(f *Field, largestName int) {
 	g.out.WriteString(f.Name)
-	g.out.WriteString(" ")
+	g.out.WriteString(strings.Repeat(" ", largestName-len(f.Name)+1))
 	g.genStructTypeRef(f.Type)
 	g.out.EndOfLine()
 }
@@ -51,13 +51,26 @@ func (g *generateGoStructs) genStructFile(file *File) {
 			g.out.EndOfLine()
 			g.out.WriteLine("type " + d.Name + " struct {")
 			g.out.Indent()
+
+			largestName := 0
 			if g.isAst {
-				g.out.WriteLine("Loc util.Location")
-				// HACK to make translation simpler.
-				g.out.WriteLine("Temp interface{}")
+				// Injected fields.
+				largestName = 4
 			}
 			for _, f := range d.Fields {
-				g.genStructField(f)
+				l := len(f.Name)
+				if l > largestName {
+					largestName = l
+				}
+			}
+
+			if g.isAst {
+				g.out.WriteLine("Loc" + strings.Repeat(" ", largestName-3+1) + "util.Location")
+				// HACK to make translation simpler.
+				g.out.WriteLine("Temp" + strings.Repeat(" ", largestName-4+1) + "interface{}")
+			}
+			for _, f := range d.Fields {
+				g.genStructField(f, largestName)
 			}
 			g.out.Dedent()
 			g.out.WriteLine("}")
@@ -96,12 +109,20 @@ func (g *generateGoStructs) genBindingExpr(e ParserBindingExpr) {
 			panic(i)
 		}
 	case *Construct:
-		g.out.WriteString("&" + e.Type.Name + " {")
+		g.out.WriteString("&" + e.Type.Name + "{")
 		if len(e.Args) > 0 {
 			g.out.EndOfLine()
 			g.out.Indent()
+			longestName := 0
 			for _, a := range e.Args {
-				g.out.WriteString(a.Name + ": ")
+				l := len(a.Name)
+				if l > longestName {
+					longestName = l
+				}
+			}
+
+			for _, a := range e.Args {
+				g.out.WriteString(a.Name + ":" + strings.Repeat(" ", longestName-len(a.Name)+1))
 				g.genBindingExpr(a.Value)
 				g.out.WriteString(",")
 				g.out.EndOfLine()

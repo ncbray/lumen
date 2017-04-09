@@ -1,10 +1,10 @@
 package resolved
 
-type Intrinsic struct {
+type IntrinsicType struct {
 	Name string
 }
 
-func (n *Intrinsic) isType() {
+func (n *IntrinsicType) isType() {
 }
 
 type Type interface {
