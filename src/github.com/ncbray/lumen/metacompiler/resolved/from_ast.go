@@ -77,6 +77,24 @@ func resolveType(ref ast.TypeRef, ns *namespace, logger log.CompilerLogger) Type
 	}
 }
 
+func canonicalTypeName(t Type) string {
+	if t == nil {
+		return "<nil>"
+	}
+	switch t := t.(type) {
+	case *IntrinsicType:
+		return t.Name
+	case *Struct:
+		return t.Name
+	case *Holder:
+		return t.Name
+	case *List:
+		return "[]" + canonicalTypeName(t.Element)
+	default:
+		panic(t)
+	}
+}
+
 func typeRefLoc(t ast.TypeRef) util.Location {
 	switch t := t.(type) {
 	case *ast.TypeName:
@@ -144,17 +162,52 @@ func resolveParserInput(t ast.TypeRef, groupLUT map[string]*ParserBindingGroup, 
 	}
 }
 
-func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBindingParam, ns *namespace, builtins *namespace, logger log.CompilerLogger) ParserBindingExpr {
+func checkCanHold(dst Type, src Type, loc util.Location, logger log.CompilerLogger) {
+	var ok bool
+	switch dst := dst.(type) {
+	case *IntrinsicType, *List, *Struct:
+		ok = dst == src
+	case *Holder:
+		if dst == src {
+			ok = src == dst
+			break
+		}
+		for _, t := range dst.Types {
+			if t == src {
+				ok = true
+				break
+			}
+		}
+	default:
+		panic(dst)
+	}
+	if !ok {
+		logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Expected %s, got %s", canonicalTypeName(dst), canonicalTypeName(src)))
+	}
+}
+
+func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBindingParam, ns *namespace, builtins *namespace, logger log.CompilerLogger) (ParserBindingExpr, Type) {
 	switch e := e.(type) {
 	case *ast.NameRef:
 		if e.Name == "loc_start" {
-			return &GetLocStart{}
+			return &GetLocStart{}, builtins.ResolveType("location")
 		}
 		p, ok := paramLUT[e.Name]
 		if ok {
+			var it Type
+			switch i := p.Input.(type) {
+			case *InputSlice:
+				it = builtins.ResolveType("string")
+			case *InputList:
+				it = listOfType(i.Element.Type)
+			case *ParserBindingGroup:
+				it = i.Type
+			default:
+				panic(i)
+			}
 			return &GetParam{
 				Param: p,
-			}
+			}, it
 		}
 		panic(e.Name)
 	case *ast.Construct:
@@ -162,13 +215,13 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 		if t == nil {
 			loc := e.Loc
 			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown type %q.", e.Name))
-			return nil
+			return nil, nil
 		}
 		st, ok := t.(*Struct)
 		if !ok {
 			loc := e.Loc
 			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "Can only construct structures.")
-			return nil
+			return nil, nil
 		}
 
 		fieldLUT := map[string]*Field{}
@@ -183,7 +236,8 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 				loc := e.Loc
 				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown field %s.%s", st.Name, arg.Name))
 			}
-			value := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
+			value, vt := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
+			checkCanHold(f.Type, vt, arg.Loc, logger)
 			args = append(args, &FieldArg{
 				Field: f,
 				Value: value,
@@ -192,7 +246,7 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 		return &Construct{
 			Type: st,
 			Args: args,
-		}
+		}, st
 	default:
 		panic(e)
 	}
@@ -334,7 +388,8 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 						paramLUT[p.Name] = rp
 					}
 					// TODO check type
-					e := resolveBindingExpr(m.Body, paramLUT, ns, builtins, logger)
+					e, et := resolveBindingExpr(m.Body, paramLUT, ns, builtins, logger)
+					checkCanHold(rg.Type, et, m.Loc, logger)
 					rm := &ParserBindingMapping{
 						Rule:   m.Name,
 						Params: params,
