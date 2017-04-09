@@ -5,6 +5,19 @@ import (
 	"github.com/ncbray/lumen/util"
 )
 
+type Field struct {
+	Temp interface{}
+	Loc  util.Location
+	Name string
+	Type string
+}
+
+type Format struct {
+	Temp   interface{}
+	Loc    util.Location
+	Fields []*Field
+}
+
 type GetName struct {
 	Temp interface{}
 	Loc  util.Location
@@ -61,7 +74,7 @@ type Expr interface {
 type VarDecl struct {
 	Temp  interface{}
 	Loc   util.Location
-	T     string
+	Type  string
 	Name  string
 	Value Expr
 }
@@ -92,11 +105,14 @@ type Statement interface {
 }
 
 type ShaderDecl struct {
-	Temp interface{}
-	Loc  util.Location
-	Name string
-	Vs   []Statement
-	Fs   []Statement
+	Temp      interface{}
+	Loc       util.Location
+	Name      string
+	Uniform   *Format
+	Attribute *Format
+	Varying   *Format
+	Vs        []Statement
+	Fs        []Statement
 }
 
 type File struct {
@@ -106,6 +122,39 @@ type File struct {
 
 type ASTConverter struct {
 	Filename string
+}
+
+func (c *ASTConverter) ConvertField(ctx parser.IFieldContext) *Field {
+	switch ctx := ctx.(type) {
+	case *parser.FieldContext:
+		return &Field{
+			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
+			Name: ctx.GetName().GetText(),
+			Type: ctx.GetT().GetText(),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertFieldList(src []parser.IFieldContext) []*Field {
+	dst := make([]*Field, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertField(child)
+	}
+	return dst
+}
+
+func (c *ASTConverter) ConvertFormat(ctx parser.IFormatContext) *Format {
+	switch ctx := ctx.(type) {
+	case *parser.FormatContext:
+		return &Format{
+			Loc:    util.GetLocation(c.Filename, ctx.GetStart()),
+			Fields: c.ConvertFieldList(ctx.GetFields()),
+		}
+	default:
+		panic(ctx)
+	}
 }
 
 func (c *ASTConverter) ConvertExpr(ctx parser.IExprContext) Expr {
@@ -157,7 +206,7 @@ func (c *ASTConverter) ConvertStatement(ctx parser.IStatementContext) Statement 
 	case *parser.VarDeclContext:
 		return &VarDecl{
 			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
-			T:     ctx.GetT().GetText(),
+			Type:  ctx.GetT().GetText(),
 			Name:  ctx.GetName().GetText(),
 			Value: c.ConvertExpr(ctx.GetValue()),
 		}
@@ -188,10 +237,13 @@ func (c *ASTConverter) ConvertShaderDecl(ctx parser.IShaderDeclContext) *ShaderD
 	switch ctx := ctx.(type) {
 	case *parser.ShaderDeclContext:
 		return &ShaderDecl{
-			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
-			Name: ctx.GetName().GetText(),
-			Vs:   c.ConvertStatementList(ctx.GetVs()),
-			Fs:   c.ConvertStatementList(ctx.GetFs()),
+			Loc:       util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:      ctx.GetName().GetText(),
+			Uniform:   c.ConvertFormat(ctx.GetUniform()),
+			Attribute: c.ConvertFormat(ctx.GetAttribute()),
+			Varying:   c.ConvertFormat(ctx.GetVarying()),
+			Vs:        c.ConvertStatementList(ctx.GetVs()),
+			Fs:        c.ConvertStatementList(ctx.GetFs()),
 		}
 	default:
 		panic(ctx)

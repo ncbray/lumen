@@ -1,5 +1,9 @@
 package resolved
 
+import (
+	"github.com/ncbray/lumen/util"
+)
+
 type IntrinsicType struct {
 	Temp interface{}
 	Name string
@@ -10,6 +14,17 @@ func (n *IntrinsicType) isType() {
 
 type Type interface {
 	isType()
+}
+
+type Field struct {
+	Temp interface{}
+	Name string
+	Type Type
+}
+
+type Format struct {
+	Temp   interface{}
+	Fields []*Field
 }
 
 type Local struct {
@@ -83,6 +98,38 @@ type Expr interface {
 	isExpr()
 }
 
+type ExprValue struct {
+	Temp interface{}
+	Loc  util.Location
+	Expr Expr
+	Type Type
+}
+
+func (n *ExprValue) isTreeValue() {
+}
+
+type TypeValue struct {
+	Temp interface{}
+	Loc  util.Location
+	Type Type
+}
+
+func (n *TypeValue) isTreeValue() {
+}
+
+type FunctionValue struct {
+	Temp interface{}
+	Loc  util.Location
+	Name string
+}
+
+func (n *FunctionValue) isTreeValue() {
+}
+
+type TreeValue interface {
+	isTreeValue()
+}
+
 type SetOutput struct {
 	Temp  interface{}
 	Name  string
@@ -121,10 +168,13 @@ type Function struct {
 }
 
 type ShaderProgram struct {
-	Temp interface{}
-	Name string
-	Fs   *Function
-	Vs   *Function
+	Temp      interface{}
+	Name      string
+	Uniform   *Format
+	Attribute *Format
+	Varying   *Format
+	Fs        *Function
+	Vs        *Function
 }
 
 type File struct {

@@ -4,6 +4,15 @@ struct IntrinsicType {
 
 holder Type = IntrinsicType;
 
+struct Field {
+  var Name string;
+  var Type Type;
+}
+
+struct Format {
+  var Fields []Field;
+}
+
 struct Local {
   var Name string;
   var Type Type;
@@ -44,6 +53,25 @@ struct CallIntrinsic {
 
 holder Expr = GetInput | GetLocal | Number | Prefix | Infix | Constructor | CallIntrinsic;
 
+struct ExprValue {
+  var Loc location;
+  var Expr Expr;
+  var Type Type;
+}
+
+struct TypeValue {
+  var Loc location;
+  var Type Type;
+}
+
+struct FunctionValue {
+  var Loc location;
+  var Name string;
+}
+
+// TODO holder of holders?
+holder TreeValue = ExprValue | TypeValue | FunctionValue;
+
 struct SetOutput {
   var Name string;
   var Value Expr;
@@ -68,6 +96,9 @@ struct Function {
 
 struct ShaderProgram {
   var Name string;
+  var Uniform Format;
+  var Attribute Format;
+  var Varying Format;
   var Fs Function;
   var Vs Function;
 }

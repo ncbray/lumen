@@ -1,3 +1,14 @@
+struct Field {
+  var Loc location;
+  var Name string;
+  var Type string;
+}
+
+struct Format {
+  var Loc location;
+  var Fields []Field;
+}
+
 struct GetName {
   var Loc location;
   var Name string;
@@ -32,7 +43,7 @@ holder Expr = GetName | Number | Prefix | Infix | Call;
 
 struct VarDecl {
   var Loc location;
-  var T string;
+  var Type string;
   var Name string;
   var Value Expr;
 }
@@ -52,6 +63,9 @@ holder Statement = VarDecl | Assign | Discard;
 struct ShaderDecl {
   var Loc location;
   var Name string;
+  var Uniform Format;
+  var Attribute Format;
+  var Varying Format;
   var Vs []Statement;
   var Fs []Statement;
 }
@@ -61,6 +75,12 @@ struct File {
 }
 
 parser {
+  field:Field {
+    default(name string, t string) => Field{Loc: loc_start, Name: name, Type: t}
+  }
+  format:Format {
+    default(fields []field) => Format{Loc: loc_start, Fields: fields}
+  }
   expr:Expr {
     getName(name string) => GetName{Loc: loc_start, Name: name}
     number(raw string) => Number{Loc: loc_start, Raw: raw}
@@ -69,12 +89,19 @@ parser {
     call(value expr, args []expr) => Call{Loc: loc_start, Value: value, Args: args}
   }
   statement:Statement {
-    varDecl(t string, name string, value expr) => VarDecl{Loc: loc_start, T: t, Name: name, Value: value}
+    varDecl(t string, name string, value expr) => VarDecl{Loc: loc_start, Type: t, Name: name, Value: value}
     assign(name string, value expr) => Assign{Loc: loc_start, Name: name, Value: value}
     discard(value expr) => Discard{Value: value}
   }
   shaderDecl:ShaderDecl {
-    default(name string, vs []statement, fs []statement) => ShaderDecl{Loc: loc_start, Name: name, Vs: vs, Fs: fs}
+    default(name string, uniform format, attribute format, varying format, vs []statement, fs []statement) => ShaderDecl{
+        Loc: loc_start,
+        Name: name,
+        Uniform: uniform,
+        Attribute: attribute,
+        Varying: varying,
+        Vs: vs,
+        Fs: fs}
   }
   file:File {
     default(shaders []shaderDecl) => File{Shaders: shaders}

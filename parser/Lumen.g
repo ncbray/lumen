@@ -2,7 +2,8 @@ grammar Lumen;
 
 // TODO paren
 expr
-  : op=('+'|'-'|'~'|'!') value=expr # prefix
+  : value=expr '(' (args+=expr (',' args+=expr)*)? ')' # call
+  | op=('+'|'-'|'~'|'!') value=expr # prefix
   | left=expr op=('*'|'/'|'%') right=expr # infix
   | left=expr op=('+'|'-') right=expr # infix
   | left=expr op=('<<'|'>>') right=expr # infix
@@ -13,7 +14,6 @@ expr
   | left=expr op='|' right=expr # infix
   | left=expr op='&&' right=expr # infix
   | left=expr op='||' right=expr # infix
-  | value=expr '(' (args+=expr (',' args+=expr)*)? ')' # call
   | name=ID # getName
   | raw=NUM # number
   ;
@@ -24,8 +24,19 @@ statement
   | value=expr ';' # discard
   ;
 
+field
+  : name=ID t=ID ';'
+  ;
+
+format
+  : '{' (fields+=field)* '}'
+  ;
+
 shaderDecl
   : 'shader' name=ID '{'
+      'uniform' uniform=format
+      'attribute' attribute=format
+      'varying' varying=format
       'vs' '{' (vs+=statement)* '}'
       'fs' '{' (fs+=statement)* '}'
     '}'

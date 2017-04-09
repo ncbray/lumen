@@ -225,10 +225,26 @@ func GenerateGo(pkg string, file *File, parserPackage string, out io.Writer) {
 		isAst: isAst,
 	}
 
+	usesLocation := false
+	for _, t := range file.Types {
+		switch t := t.(type) {
+		case *Struct:
+			for _, f := range t.Fields {
+				switch ft := f.Type.(type) {
+				case *IntrinsicType:
+					if ft.Name == "location" {
+						usesLocation = true
+					}
+				}
+			}
+		}
+	}
+
 	imports := []string{}
 	if isAst {
 		imports = append(imports, parserPackage)
-		// TODO pull in util package as needed.
+	}
+	if usesLocation {
 		imports = append(imports, "github.com/ncbray/lumen/util")
 	}
 	generateGoHeader(pkg, imports, g.out)

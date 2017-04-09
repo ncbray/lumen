@@ -32,6 +32,12 @@ type LumenListener interface {
 	// EnterDiscard is called when entering the discard production.
 	EnterDiscard(c *DiscardContext)
 
+	// EnterField is called when entering the field production.
+	EnterField(c *FieldContext)
+
+	// EnterFormat is called when entering the format production.
+	EnterFormat(c *FormatContext)
+
 	// EnterShaderDecl is called when entering the shaderDecl production.
 	EnterShaderDecl(c *ShaderDeclContext)
 
@@ -61,6 +67,12 @@ type LumenListener interface {
 
 	// ExitDiscard is called when exiting the discard production.
 	ExitDiscard(c *DiscardContext)
+
+	// ExitField is called when exiting the field production.
+	ExitField(c *FieldContext)
+
+	// ExitFormat is called when exiting the format production.
+	ExitFormat(c *FormatContext)
 
 	// ExitShaderDecl is called when exiting the shaderDecl production.
 	ExitShaderDecl(c *ShaderDeclContext)

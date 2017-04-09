@@ -231,12 +231,13 @@ func resolveBindingExpr(e ast.ParserBindingExpr, paramLUT map[string]*ParserBind
 
 		args := []*FieldArg{}
 		for _, arg := range e.Args {
+			value, vt := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
 			f, ok := fieldLUT[arg.Name]
 			if !ok {
 				loc := e.Loc
 				logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("Unknown field %s.%s", st.Name, arg.Name))
+				continue
 			}
-			value, vt := resolveBindingExpr(arg.Value, paramLUT, ns, builtins, logger)
 			checkCanHold(f.Type, vt, arg.Loc, logger)
 			args = append(args, &FieldArg{
 				Field: f,

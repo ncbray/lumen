@@ -69,6 +69,18 @@ func (s *BaseLumenListener) EnterDiscard(ctx *DiscardContext) {}
 // ExitDiscard is called when production discard is exited.
 func (s *BaseLumenListener) ExitDiscard(ctx *DiscardContext) {}
 
+// EnterField is called when production field is entered.
+func (s *BaseLumenListener) EnterField(ctx *FieldContext) {}
+
+// ExitField is called when production field is exited.
+func (s *BaseLumenListener) ExitField(ctx *FieldContext) {}
+
+// EnterFormat is called when production format is entered.
+func (s *BaseLumenListener) EnterFormat(ctx *FormatContext) {}
+
+// ExitFormat is called when production format is exited.
+func (s *BaseLumenListener) ExitFormat(ctx *FormatContext) {}
+
 // EnterShaderDecl is called when production shaderDecl is entered.
 func (s *BaseLumenListener) EnterShaderDecl(ctx *ShaderDeclContext) {}
 
