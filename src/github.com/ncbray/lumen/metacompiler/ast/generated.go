@@ -6,8 +6,8 @@ import (
 )
 
 type TypeName struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 }
 
@@ -15,8 +15,8 @@ func (n *TypeName) isTypeRef() {
 }
 
 type ListRef struct {
-	Loc     util.Location
 	Temp    interface{}
+	Loc     util.Location
 	Element TypeRef
 }
 
@@ -28,8 +28,8 @@ type TypeRef interface {
 }
 
 type FieldDecl struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 	T    TypeRef
 }
@@ -42,15 +42,15 @@ type MemberDecl interface {
 }
 
 type KeywordArg struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Name  string
 	Value ParserBindingExpr
 }
 
 type Construct struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 	Args []*KeywordArg
 }
@@ -59,8 +59,8 @@ func (n *Construct) isParserBindingExpr() {
 }
 
 type NameRef struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 }
 
@@ -72,31 +72,31 @@ type ParserBindingExpr interface {
 }
 
 type ParamDecl struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 	T    TypeRef
 }
 
 type ParserBindingMapping struct {
-	Loc    util.Location
 	Temp   interface{}
+	Loc    util.Location
 	Name   string
 	Params []*ParamDecl
 	Body   ParserBindingExpr
 }
 
 type ParserBindingGroup struct {
-	Loc      util.Location
 	Temp     interface{}
+	Loc      util.Location
 	Name     string
 	T        TypeRef
 	Mappings []*ParserBindingMapping
 }
 
 type StructDecl struct {
-	Loc     util.Location
 	Temp    interface{}
+	Loc     util.Location
 	Name    string
 	Members []MemberDecl
 }
@@ -105,8 +105,8 @@ func (n *StructDecl) isDeclaration() {
 }
 
 type HolderDecl struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Name  string
 	Types []TypeRef
 }
@@ -115,8 +115,8 @@ func (n *HolderDecl) isDeclaration() {
 }
 
 type ParserBindingDecl struct {
-	Loc    util.Location
 	Temp   interface{}
+	Loc    util.Location
 	Groups []*ParserBindingGroup
 }
 
@@ -128,8 +128,8 @@ type Declaration interface {
 }
 
 type File struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Decls []Declaration
 }
 

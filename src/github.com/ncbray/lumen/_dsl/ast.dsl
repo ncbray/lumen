@@ -1,23 +1,28 @@
 struct GetName {
+  var Loc location;
   var Name string;
 }
 
 struct Number {
+  var Loc location;
   var Raw string;
 }
 
 struct Prefix {
+  var Loc location;
   var Op string;
   var Value Expr;
 }
 
 struct Infix {
+  var Loc location;
   var Left Expr;
   var Op string;
   var Right Expr;
 }
 
 struct Call {
+  var Loc location;
   var Value Expr;
   var Args []Expr;
 }
@@ -26,29 +31,34 @@ holder Expr = GetName | Number | Prefix | Infix | Call;
 
 
 struct VarDecl {
+  var Loc location;
   var T string;
   var Name string;
   var Value Expr;
 }
 
 struct Assign {
+  var Loc location;
   var Name string;
   var Value Expr;
 }
 
 struct Discard {
+  var Loc location;
   var Value Expr;
 }
 
 holder Statement = VarDecl | Assign | Discard;
 
 struct ShaderDecl {
+  var Loc location;
   var Name string;
   var Vs []Statement;
   var Fs []Statement;
 }
 
 struct File {
+  var Loc location;
   var Shaders []ShaderDecl;
 }
 

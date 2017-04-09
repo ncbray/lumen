@@ -1,6 +1,7 @@
 package resolved
 
 type IntrinsicType struct {
+	Temp interface{}
 	Name string
 }
 
@@ -12,11 +13,13 @@ type Type interface {
 }
 
 type Local struct {
+	Temp interface{}
 	Name string
 	Type Type
 }
 
 type GetInput struct {
+	Temp interface{}
 	Name string
 }
 
@@ -24,6 +27,7 @@ func (n *GetInput) isExpr() {
 }
 
 type GetLocal struct {
+	Temp  interface{}
 	Local *Local
 }
 
@@ -31,13 +35,15 @@ func (n *GetLocal) isExpr() {
 }
 
 type Number struct {
-	Raw string
+	Temp interface{}
+	Raw  string
 }
 
 func (n *Number) isExpr() {
 }
 
 type Prefix struct {
+	Temp  interface{}
 	Op    string
 	Value Expr
 }
@@ -46,6 +52,7 @@ func (n *Prefix) isExpr() {
 }
 
 type Infix struct {
+	Temp  interface{}
 	Left  Expr
 	Op    string
 	Right Expr
@@ -55,6 +62,7 @@ func (n *Infix) isExpr() {
 }
 
 type Constructor struct {
+	Temp interface{}
 	Type Type
 	Args []Expr
 }
@@ -63,6 +71,7 @@ func (n *Constructor) isExpr() {
 }
 
 type CallIntrinsic struct {
+	Temp interface{}
 	Name string
 	Args []Expr
 }
@@ -75,6 +84,7 @@ type Expr interface {
 }
 
 type SetOutput struct {
+	Temp  interface{}
 	Name  string
 	Value Expr
 }
@@ -83,6 +93,7 @@ func (n *SetOutput) isStatement() {
 }
 
 type SetLocal struct {
+	Temp  interface{}
 	Local *Local
 	Value Expr
 }
@@ -91,6 +102,7 @@ func (n *SetLocal) isStatement() {
 }
 
 type Discard struct {
+	Temp  interface{}
 	Value Expr
 }
 
@@ -102,17 +114,20 @@ type Statement interface {
 }
 
 type Function struct {
+	Temp   interface{}
 	Name   string
 	Locals []*Local
 	Body   []Statement
 }
 
 type ShaderProgram struct {
+	Temp interface{}
 	Name string
 	Fs   *Function
 	Vs   *Function
 }
 
 type File struct {
+	Temp     interface{}
 	Programs []*ShaderProgram
 }

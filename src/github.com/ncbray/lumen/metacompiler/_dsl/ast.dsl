@@ -1,14 +1,17 @@
 struct TypeName {
+  var Loc location;
   var Name string;
 }
 
 struct ListRef {
+  var Loc location;
   var Element TypeRef;
 }
 
 holder TypeRef = TypeName | ListRef;
 
 struct FieldDecl {
+  var Loc location;
   var Name string;
   var T TypeRef;
 }
@@ -16,49 +19,58 @@ struct FieldDecl {
 holder MemberDecl = FieldDecl;
 
 struct KeywordArg {
+  var Loc location;
   var Name string;
   var Value ParserBindingExpr;
 }
 
 struct Construct {
+  var Loc location;
   var Name string;
   var Args []KeywordArg;
 }
 
 struct NameRef {
+  var Loc location;
   var Name string;
 }
 
 holder ParserBindingExpr = Construct | NameRef;
 
 struct ParamDecl {
+  var Loc location;
   var Name string;
   var T TypeRef;
 }
 
 struct ParserBindingMapping {
+  var Loc location;
   var Name string;
   var Params []ParamDecl;
   var Body ParserBindingExpr;
 }
 
 struct ParserBindingGroup {
+  var Loc location;
   var Name string;
   var T TypeRef;
   var Mappings []ParserBindingMapping;
 }
 
 struct StructDecl {
+  var Loc location;
   var Name string;
   var Members []MemberDecl;
 }
 
 struct HolderDecl {
+  var Loc location;
   var Name string;
   var Types []TypeRef;
 }
 
 struct ParserBindingDecl {
+  var Loc location;
   var Groups []ParserBindingGroup;
 }
 
@@ -67,6 +79,7 @@ holder Declaration = StructDecl | HolderDecl | ParserBindingDecl;
 
 // Compilation unit
 struct File {
+  var Loc location;
   var Decls []Declaration;
 }
 

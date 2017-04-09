@@ -15,7 +15,12 @@ type generateGoStructs struct {
 func (g *generateGoStructs) genStructTypeRef(t Type) {
 	switch t := t.(type) {
 	case *IntrinsicType:
-		g.out.WriteString(t.Name)
+		switch t.Name {
+		case "location":
+			g.out.WriteString("util.Location")
+		default:
+			g.out.WriteString(t.Name)
+		}
 	case *Struct:
 		g.out.WriteString("*")
 		g.out.WriteString(t.Name)
@@ -52,11 +57,7 @@ func (g *generateGoStructs) genStructFile(file *File) {
 			g.out.WriteLine("type " + d.Name + " struct {")
 			g.out.Indent()
 
-			largestName := 0
-			if g.isAst {
-				// Injected fields.
-				largestName = 4
-			}
+			largestName := 4 // Temp
 			for _, f := range d.Fields {
 				l := len(f.Name)
 				if l > largestName {
@@ -64,11 +65,9 @@ func (g *generateGoStructs) genStructFile(file *File) {
 				}
 			}
 
-			if g.isAst {
-				g.out.WriteLine("Loc" + strings.Repeat(" ", largestName-3+1) + "util.Location")
-				// HACK to make translation simpler.
-				g.out.WriteLine("Temp" + strings.Repeat(" ", largestName-4+1) + "interface{}")
-			}
+			// HACK to make translation simpler.
+			g.out.WriteLine("Temp" + strings.Repeat(" ", largestName-4+1) + "interface{}")
+
 			for _, f := range d.Fields {
 				g.genStructField(f, largestName)
 			}
@@ -228,6 +227,7 @@ func GenerateGo(pkg string, file *File, parserPackage string, out io.Writer) {
 	imports := []string{}
 	if isAst {
 		imports = append(imports, parserPackage)
+		// TODO pull in util package as needed.
 		imports = append(imports, "github.com/ncbray/lumen/util")
 	}
 	generateGoHeader(pkg, imports, g.out)

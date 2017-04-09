@@ -191,8 +191,9 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	builtins := &namespace{
 		parent: nil,
 		types: map[string]Type{
-			"string": &IntrinsicType{Name: "string"},
-			"bool":   &IntrinsicType{Name: "bool"},
+			"string":   &IntrinsicType{Name: "string"},
+			"bool":     &IntrinsicType{Name: "bool"},
+			"location": &IntrinsicType{Name: "location"},
 		},
 	}
 	ns := &namespace{

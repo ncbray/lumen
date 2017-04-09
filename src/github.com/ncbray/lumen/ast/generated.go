@@ -6,8 +6,8 @@ import (
 )
 
 type GetName struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 }
 
@@ -15,8 +15,8 @@ func (n *GetName) isExpr() {
 }
 
 type Number struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Raw  string
 }
 
@@ -24,8 +24,8 @@ func (n *Number) isExpr() {
 }
 
 type Prefix struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Op    string
 	Value Expr
 }
@@ -34,8 +34,8 @@ func (n *Prefix) isExpr() {
 }
 
 type Infix struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Left  Expr
 	Op    string
 	Right Expr
@@ -45,8 +45,8 @@ func (n *Infix) isExpr() {
 }
 
 type Call struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Value Expr
 	Args  []Expr
 }
@@ -59,8 +59,8 @@ type Expr interface {
 }
 
 type VarDecl struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	T     string
 	Name  string
 	Value Expr
@@ -70,8 +70,8 @@ func (n *VarDecl) isStatement() {
 }
 
 type Assign struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Name  string
 	Value Expr
 }
@@ -80,8 +80,8 @@ func (n *Assign) isStatement() {
 }
 
 type Discard struct {
-	Loc   util.Location
 	Temp  interface{}
+	Loc   util.Location
 	Value Expr
 }
 
@@ -93,16 +93,16 @@ type Statement interface {
 }
 
 type ShaderDecl struct {
-	Loc  util.Location
 	Temp interface{}
+	Loc  util.Location
 	Name string
 	Vs   []Statement
 	Fs   []Statement
 }
 
 type File struct {
-	Loc     util.Location
 	Temp    interface{}
+	Loc     util.Location
 	Shaders []*ShaderDecl
 }
 
