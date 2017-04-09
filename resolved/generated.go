@@ -34,8 +34,8 @@ type Local struct {
 }
 
 type GetInput struct {
-	Temp interface{}
-	Name string
+	Temp  interface{}
+	Input *Field
 }
 
 func (n *GetInput) isExpr() {
@@ -131,9 +131,9 @@ type TreeValue interface {
 }
 
 type SetOutput struct {
-	Temp  interface{}
-	Name  string
-	Value Expr
+	Temp   interface{}
+	Output *Field
+	Value  Expr
 }
 
 func (n *SetOutput) isStatement() {

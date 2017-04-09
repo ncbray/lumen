@@ -61,12 +61,12 @@ func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
 				},
 			}
 		}
-		_, ok = conv.Inputs[name]
+		inp, ok := conv.Inputs[name]
 		if ok {
 			return &ExprValue{
 				Loc: src.Loc,
 				Expr: &GetInput{
-					Name: name,
+					Input: inp,
 				},
 			}
 		}
@@ -78,6 +78,7 @@ func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
 			}
 		}
 
+		// HACK assume it's a function.
 		return &FunctionValue{
 			Loc:  src.Loc,
 			Name: name,
@@ -142,6 +143,7 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 	for _, stmt := range src {
 		switch stmt := stmt.(type) {
 		case *ast.VarDecl:
+			value := conv.requireExpr(conv.handleExpr(stmt.Value))
 			// TODO type?
 			_, ok := conv.LocalLut[stmt.Name]
 			if ok {
@@ -154,13 +156,29 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 			conv.LocalLut[lcl.Name] = lcl
 			dst = append(dst, &SetLocal{
 				Local: lcl,
-				Value: conv.requireExpr(conv.handleExpr(stmt.Value)),
+				Value: value,
 			})
 		case *ast.Assign:
-			dst = append(dst, &SetOutput{
-				Name:  stmt.Name,
-				Value: conv.requireExpr(conv.handleExpr(stmt.Value)),
-			})
+			value := conv.requireExpr(conv.handleExpr(stmt.Value))
+			lcl, ok := conv.LocalLut[stmt.Name]
+			if ok {
+				dst = append(dst, &SetLocal{
+					Local: lcl,
+					Value: value,
+				})
+				continue
+			}
+			outp, ok := conv.Outputs[stmt.Name]
+			if ok {
+				dst = append(dst, &SetOutput{
+					Output: outp,
+					Value:  conv.requireExpr(conv.handleExpr(stmt.Value)),
+				})
+				continue
+			}
+
+			loc := stmt.Loc
+			logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot assign to %q", stmt.Name))
 		default:
 			panic(stmt)
 		}
@@ -207,6 +225,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			c.Inputs[f.Name] = f
 		}
 		c.Outputs = map[string]*Field{}
+		c.Outputs["gl_Position"] = &Field{Name: "gl_Position", Type: c.Intrinsics["vec4"]}
 		for _, f := range varying.Fields {
 			c.Outputs[f.Name] = f
 		}
@@ -226,6 +245,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			c.Inputs[f.Name] = f
 		}
 		c.Outputs = map[string]*Field{}
+		c.Outputs["gl_FragColor"] = &Field{Name: "gl_FragColor", Type: c.Intrinsics["vec4"]}
 
 		locals, body = c.handleBody(s.Fs, logger)
 		fs := &Function{

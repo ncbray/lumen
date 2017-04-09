@@ -19,7 +19,7 @@ struct Local {
 }
 
 struct GetInput {
-  var Name string;
+  var Input Field;
 }
 
 struct GetLocal {
@@ -73,7 +73,7 @@ struct FunctionValue {
 holder TreeValue = ExprValue | TypeValue | FunctionValue;
 
 struct SetOutput {
-  var Name string;
+  var Output Field;
   var Value Expr;
 }
 
