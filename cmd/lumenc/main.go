@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -68,9 +69,18 @@ func run() bool {
 	if logger.NumErrors() > 0 {
 		return false
 	}
-	resolved.FromAST(file, logger)
+	rfile := resolved.FromAST(file, logger)
 	if logger.NumErrors() > 0 {
 		return false
+	}
+
+	for _, p := range rfile.Programs {
+		fmt.Println()
+		fmt.Println("=== vert ===")
+		resolved.GenerateGLSLVertShader(p, os.Stdout)
+		fmt.Println()
+		fmt.Println("=== frag ===")
+		resolved.GenerateGLSLFragShader(p, true, os.Stdout)
 	}
 
 	fsys.Commit()
