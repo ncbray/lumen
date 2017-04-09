@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -40,6 +39,7 @@ func parseFile(filename string, fsys fs.FileSystem, logger log.CompilerLogger) *
 }
 
 func run() bool {
+	var pkg string
 	var input string
 
 	inputFile := &cmdline.FilePath{
@@ -48,6 +48,10 @@ func run() bool {
 
 	app := cmdline.MakeApp("lumenc")
 	app.RequiredArgs([]*cmdline.Argument{
+		{
+			Name:  "package",
+			Value: cmdline.String.Set(&pkg),
+		},
 		{
 			Name:  "input",
 			Value: inputFile.Set(&input),
@@ -74,14 +78,7 @@ func run() bool {
 		return false
 	}
 
-	for _, p := range rfile.Programs {
-		fmt.Println()
-		fmt.Println("=== vert ===")
-		resolved.GenerateGLSLVertShader(p, os.Stdout)
-		fmt.Println()
-		fmt.Println("=== frag ===")
-		resolved.GenerateGLSLFragShader(p, true, os.Stdout)
-	}
+	resolved.GenerateHaxe(pkg, rfile, true, os.Stdout)
 
 	fsys.Commit()
 	return true
