@@ -39,6 +39,7 @@ func parseFile(filename string, fsys fs.FileSystem, logger log.CompilerLogger) *
 }
 
 func run() bool {
+	var minify bool
 	var input string
 	var pkg string
 	var target string
@@ -55,6 +56,12 @@ func run() bool {
 	}
 
 	app := cmdline.MakeApp("lumenc")
+	app.Flags([]*cmdline.Flag{
+		{
+			Long: "minify",
+			Call: cmdline.SetTrue(&minify),
+		},
+	})
 	app.RequiredArgs([]*cmdline.Argument{
 		{
 			Name:  "input",
@@ -101,7 +108,7 @@ func run() bool {
 		return false
 	}
 	defer ow.Close()
-	resolved.GenerateHaxe(pkg, rfile, target == "android" || target == "html5" || target == "ios", ow)
+	resolved.GenerateHaxe(pkg, rfile, target == "android" || target == "html5" || target == "ios", minify, ow)
 
 	fsys.Commit()
 	return true

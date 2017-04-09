@@ -7,9 +7,10 @@ import (
 
 	"github.com/ncbray/compilerutil/names"
 	"github.com/ncbray/compilerutil/writer"
+	"github.com/ncbray/lumen/glsl"
 )
 
-func GenerateHaxe(pkg string, file *File, declPrecision bool, out io.Writer) {
+func GenerateHaxe(pkg string, file *File, declPrecision bool, minify bool, out io.Writer) {
 	o := writer.MakeTabbedWriter("  ", out)
 
 	o.WriteLine("package " + pkg + ";")
@@ -46,8 +47,16 @@ func GenerateHaxe(pkg string, file *File, declPrecision bool, out io.Writer) {
 			}
 		}
 
-		o.WriteLine(fmt.Sprintf("public static inline var VERTEX_SHADER_SOURCE = %q;", vs.String()))
-		o.WriteLine(fmt.Sprintf("public static inline var FRAGMENT_SHADER_SOURCE = %q;", fs.String()))
+		vsSrc := vs.String()
+		fsSrc := fs.String()
+
+		if minify {
+			vsSrc = glsl.CompactSource(vsSrc)
+			fsSrc = glsl.CompactSource(fsSrc)
+		}
+
+		o.WriteLine(fmt.Sprintf("public static inline var VERTEX_SHADER_SOURCE = %q;", vsSrc))
+		o.WriteLine(fmt.Sprintf("public static inline var FRAGMENT_SHADER_SOURCE = %q;", fsSrc))
 
 		o.WriteString("public static var ATTRIBUTE_NAMES = [")
 		for i, a := range p.Attribute.Fields {
