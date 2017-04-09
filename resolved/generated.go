@@ -49,6 +49,15 @@ type GetLocal struct {
 func (n *GetLocal) isExpr() {
 }
 
+type GetAttr struct {
+	Temp  interface{}
+	Value Expr
+	Name  string
+}
+
+func (n *GetAttr) isExpr() {
+}
+
 type Number struct {
 	Temp interface{}
 	Raw  string

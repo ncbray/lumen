@@ -27,6 +27,16 @@ type GetName struct {
 func (n *GetName) isExpr() {
 }
 
+type GetAttr struct {
+	Temp  interface{}
+	Loc   util.Location
+	Value Expr
+	Name  string
+}
+
+func (n *GetAttr) isExpr() {
+}
+
 type Number struct {
 	Temp interface{}
 	Loc  util.Location
@@ -163,6 +173,12 @@ func (c *ASTConverter) ConvertExpr(ctx parser.IExprContext) Expr {
 		return &GetName{
 			Loc:  util.GetLocation(c.Filename, ctx.GetStart()),
 			Name: ctx.GetName().GetText(),
+		}
+	case *parser.GetAttrContext:
+		return &GetAttr{
+			Loc:   util.GetLocation(c.Filename, ctx.GetStart()),
+			Value: c.ConvertExpr(ctx.GetValue()),
+			Name:  ctx.GetName().GetText(),
 		}
 	case *parser.NumberContext:
 		return &Number{

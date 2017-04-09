@@ -14,6 +14,12 @@ struct GetName {
   var Name string;
 }
 
+struct GetAttr {
+  var Loc location;
+  var Value Expr;
+  var Name string;
+}
+
 struct Number {
   var Loc location;
   var Raw string;
@@ -38,7 +44,7 @@ struct Call {
   var Args []Expr;
 }
 
-holder Expr = GetName | Number | Prefix | Infix | Call;
+holder Expr = GetName | GetAttr | Number | Prefix | Infix | Call;
 
 
 struct VarDecl {
@@ -83,6 +89,7 @@ parser {
   }
   expr:Expr {
     getName(name string) => GetName{Loc: loc_start, Name: name}
+    getAttr(value expr, name string) => GetAttr{Loc: loc_start, Value: value, Name: name}
     number(raw string) => Number{Loc: loc_start, Raw: raw}
     prefix(op string, value expr) => Prefix{Loc: loc_start, Op: op, Value: value}
     infix(left expr, op string, right expr) => Infix{Loc: loc_start, Left: left, Op: op, Right: right}

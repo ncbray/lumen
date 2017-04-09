@@ -20,6 +20,9 @@ type LumenListener interface {
 	// EnterPrefix is called when entering the prefix production.
 	EnterPrefix(c *PrefixContext)
 
+	// EnterGetAttr is called when entering the getAttr production.
+	EnterGetAttr(c *GetAttrContext)
+
 	// EnterInfix is called when entering the infix production.
 	EnterInfix(c *InfixContext)
 
@@ -55,6 +58,9 @@ type LumenListener interface {
 
 	// ExitPrefix is called when exiting the prefix production.
 	ExitPrefix(c *PrefixContext)
+
+	// ExitGetAttr is called when exiting the getAttr production.
+	ExitGetAttr(c *GetAttrContext)
 
 	// ExitInfix is called when exiting the infix production.
 	ExitInfix(c *InfixContext)

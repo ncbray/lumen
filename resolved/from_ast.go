@@ -87,6 +87,13 @@ func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
 		//loc := src.Loc
 		//conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot resolve name %q", name))
 		//return nil
+	case *ast.GetAttr:
+		return &ExprValue{
+			Expr: &GetAttr{
+				Value: conv.requireExpr(conv.handleExpr(src.Value)),
+				Name:  src.Name,
+			},
+		}
 	case *ast.Infix:
 		return &ExprValue{
 			Expr: &Infix{

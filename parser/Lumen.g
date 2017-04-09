@@ -3,6 +3,7 @@ grammar Lumen;
 // TODO paren
 expr
   : value=expr '(' (args+=expr (',' args+=expr)*)? ')' # call
+  | value=expr '.' name=ID # getAttr
   | op=('+'|'-'|'~'|'!') value=expr # prefix
   | left=expr op=('*'|'/'|'%') right=expr # infix
   | left=expr op=('+'|'-') right=expr # infix

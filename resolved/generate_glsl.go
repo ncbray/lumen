@@ -49,6 +49,10 @@ func generateExpr(e Expr, o *writer.TabbedWriter) {
 		o.WriteString(e.Op)
 		o.WriteString(" ")
 		generateExpr(e.Right, o)
+	case *GetAttr:
+		generateExpr(e.Value, o)
+		o.WriteString(".")
+		o.WriteString(e.Name)
 	case *Constructor:
 		o.WriteString(typeName(e.Type))
 		generateArgs(e.Args, o)

@@ -26,6 +26,11 @@ struct GetLocal {
   var Local Local;
 }
 
+struct GetAttr {
+  var Value Expr;
+  var Name string;
+}
+
 struct Number {
   var Raw string;
 }
@@ -51,7 +56,7 @@ struct CallIntrinsic {
   var Args []Expr;
 }
 
-holder Expr = GetInput | GetLocal | Number | Prefix | Infix | Constructor | CallIntrinsic;
+holder Expr = GetInput | GetLocal | GetAttr | Number | Prefix | Infix | Constructor | CallIntrinsic;
 
 struct ExprValue {
   var Loc location;

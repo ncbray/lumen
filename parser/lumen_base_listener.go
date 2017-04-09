@@ -45,6 +45,12 @@ func (s *BaseLumenListener) EnterPrefix(ctx *PrefixContext) {}
 // ExitPrefix is called when production prefix is exited.
 func (s *BaseLumenListener) ExitPrefix(ctx *PrefixContext) {}
 
+// EnterGetAttr is called when production getAttr is entered.
+func (s *BaseLumenListener) EnterGetAttr(ctx *GetAttrContext) {}
+
+// ExitGetAttr is called when production getAttr is exited.
+func (s *BaseLumenListener) ExitGetAttr(ctx *GetAttrContext) {}
+
 // EnterInfix is called when production infix is entered.
 func (s *BaseLumenListener) EnterInfix(ctx *InfixContext) {}
 
