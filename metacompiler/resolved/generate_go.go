@@ -8,8 +8,7 @@ import (
 )
 
 type generateGoStructs struct {
-	out   *writer.TabbedWriter
-	isAst bool
+	out *writer.TabbedWriter
 }
 
 func (g *generateGoStructs) genStructTypeRef(t Type) {
@@ -218,11 +217,8 @@ func generateGoHeader(pkg string, imports []string, out *writer.TabbedWriter) {
 }
 
 func GenerateGo(pkg string, file *File, parserPackage string, out io.Writer) {
-	isAst := file.ParserBinding != nil
-
 	g := &generateGoStructs{
-		out:   writer.MakeTabbedWriter("\t", out),
-		isAst: isAst,
+		out: writer.MakeTabbedWriter("\t", out),
 	}
 
 	usesLocation := false
@@ -241,7 +237,7 @@ func GenerateGo(pkg string, file *File, parserPackage string, out io.Writer) {
 	}
 
 	imports := []string{}
-	if isAst {
+	if file.ParserBinding != nil {
 		imports = append(imports, parserPackage)
 	}
 	if usesLocation {
