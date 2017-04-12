@@ -1,9 +1,5 @@
 package resolved
 
-import (
-	"github.com/ncbray/lumen/util"
-)
-
 type IntrinsicType struct {
 	Temp interface{}
 	Name string
@@ -95,10 +91,15 @@ type Constructor struct {
 func (n *Constructor) isExpr() {
 }
 
-type CallIntrinsic struct {
+type IntrinsicFunction struct {
 	Temp interface{}
 	Name string
-	Args []Expr
+}
+
+type CallIntrinsic struct {
+	Temp     interface{}
+	Function *IntrinsicFunction
+	Args     []Expr
 }
 
 func (n *CallIntrinsic) isExpr() {
@@ -110,7 +111,6 @@ type Expr interface {
 
 type ExprValue struct {
 	Temp interface{}
-	Loc  util.Location
 	Expr Expr
 	Type Type
 }
@@ -120,7 +120,6 @@ func (n *ExprValue) isTreeValue() {
 
 type TypeValue struct {
 	Temp interface{}
-	Loc  util.Location
 	Type Type
 }
 
@@ -128,12 +127,18 @@ func (n *TypeValue) isTreeValue() {
 }
 
 type FunctionValue struct {
-	Temp interface{}
-	Loc  util.Location
-	Name string
+	Temp     interface{}
+	Function *IntrinsicFunction
 }
 
 func (n *FunctionValue) isTreeValue() {
+}
+
+type Poison struct {
+	Temp interface{}
+}
+
+func (n *Poison) isTreeValue() {
 }
 
 type TreeValue interface {

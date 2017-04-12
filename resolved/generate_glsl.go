@@ -58,7 +58,7 @@ func generateExpr(e Expr, o *writer.TabbedWriter) {
 		o.WriteString(typeName(e.Type))
 		generateArgs(e.Args, o)
 	case *CallIntrinsic:
-		o.WriteString(e.Name)
+		o.WriteString(e.Function.Name)
 		generateArgs(e.Args, o)
 	default:
 		panic(e)

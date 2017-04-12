@@ -52,31 +52,35 @@ struct Constructor {
   var Args []Expr;
 }
 
-struct CallIntrinsic {
+struct IntrinsicFunction {
   var Name string;
+}
+
+struct CallIntrinsic {
+  var Function IntrinsicFunction;
   var Args []Expr;
 }
 
 holder Expr = GetInput | GetLocal | GetAttr | Number | Prefix | Infix | Constructor | CallIntrinsic;
 
 struct ExprValue {
-  var Loc location;
   var Expr Expr;
   var Type Type;
 }
 
 struct TypeValue {
-  var Loc location;
   var Type Type;
 }
 
 struct FunctionValue {
-  var Loc location;
-  var Name string;
+  var Function IntrinsicFunction;
+}
+
+struct Poison {
 }
 
 // TODO holder of holders?
-holder TreeValue = ExprValue | TypeValue | FunctionValue;
+holder TreeValue = ExprValue | TypeValue | FunctionValue | Poison;
 
 struct SetOutput {
   var Output Field;

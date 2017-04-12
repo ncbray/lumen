@@ -15,85 +15,77 @@ type astConverter struct {
 	Inputs     map[string]*Field
 	Outputs    map[string]*Field
 	Intrinsics map[string]*IntrinsicType
+	Namespace  map[string]TreeValue
 }
 
-func valueInfo(v TreeValue) (string, util.Location) {
+func valueInfo(v TreeValue) string {
 	switch v := v.(type) {
 	case *ExprValue:
-		return "an expression", v.Loc
+		return "an expression"
 	case *TypeValue:
-		return "type", v.Loc
+		return "type"
 	case *FunctionValue:
-		return "function " + v.Name, v.Loc
+		return "function " + v.Function.Name
 	default:
 		panic(v)
 	}
 }
 
-func (conv *astConverter) requireExpr(v TreeValue) Expr {
+func (conv *astConverter) requireExpr(v TreeValue, loc util.Location) Expr {
 	switch v := v.(type) {
 	case *ExprValue:
 		return v.Expr
+	case *Poison:
+		// Error was reported elsewhere.
+		return nil
 	default:
-		desc, loc := valueInfo(v)
+		desc := valueInfo(v)
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "expected an expression but got "+desc)
 		return nil
 	}
 }
 
-func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
+func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 	switch src := src.(type) {
 	case *ast.Number:
 		return &ExprValue{
-			Loc: src.Loc,
 			Expr: &Number{
 				Raw: src.Raw,
 			},
-		}
+		}, src.Loc
 	case *ast.GetName:
 		name := src.Name
 		lcl, ok := conv.LocalLut[name]
 		if ok {
 			return &ExprValue{
-				Loc: src.Loc,
 				Expr: &GetLocal{
 					Local: lcl,
 				},
-			}
+			}, src.Loc
 		}
 		inp, ok := conv.Inputs[name]
 		if ok {
 			return &ExprValue{
-				Loc: src.Loc,
 				Expr: &GetInput{
 					Input: inp,
 				},
-			}
+			}, src.Loc
 		}
-		t, ok := conv.Intrinsics[name]
+		tv, ok := conv.Namespace[name]
 		if ok {
-			return &TypeValue{
-				Loc:  src.Loc,
-				Type: t,
-			}
+			return tv, src.Loc
 		}
 
-		// HACK assume it's a function.
-		return &FunctionValue{
-			Loc:  src.Loc,
-			Name: name,
-		}
-
-		//loc := src.Loc
-		//conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot resolve name %q", name))
-		//return nil
+		loc := src.Loc
+		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot resolve name %q", name))
+		return &Poison{}, src.Loc
 	case *ast.GetAttr:
 		return &ExprValue{
 			Expr: &GetAttr{
 				Value: conv.requireExpr(conv.handleExpr(src.Value)),
 				Name:  src.Name,
 			},
-		}
+		}, src.Loc
 	case *ast.Infix:
 		return &ExprValue{
 			Expr: &Infix{
@@ -101,9 +93,9 @@ func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
 				Op:    src.Op,
 				Right: conv.requireExpr(conv.handleExpr(src.Right)),
 			},
-		}
+		}, src.Loc
 	case *ast.Call:
-		value := conv.handleExpr(src.Value)
+		value, loc := conv.handleExpr(src.Value)
 		args := make([]Expr, len(src.Args))
 		for i, arg := range src.Args {
 			args[i] = conv.requireExpr(conv.handleExpr(arg))
@@ -116,24 +108,27 @@ func (conv *astConverter) handleExpr(src ast.Expr) TreeValue {
 					Type: value.Type,
 					Args: args,
 				},
-			}
+			}, loc
 		case *FunctionValue:
 			return &ExprValue{
 				Expr: &CallIntrinsic{
-					Name: value.Name,
-					Args: args,
+					Function: value.Function,
+					Args:     args,
 				},
-			}
+			}, loc
+		case *Poison:
+			return value, loc
 		default:
-			desc, loc := valueInfo(value)
+			desc := valueInfo(value)
 			conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, desc+" is not callable")
-			return nil
+			return &Poison{}, loc
 		}
 	default:
 		panic(src)
 	}
 }
 
+// TODO eliminate this method.
 func (conv *astConverter) resolveTypeRef(name string, loc util.Location) Type {
 	t, ok := conv.Intrinsics[name]
 	if !ok {
@@ -179,7 +174,7 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 			if ok {
 				dst = append(dst, &SetOutput{
 					Output: outp,
-					Value:  conv.requireExpr(conv.handleExpr(stmt.Value)),
+					Value:  value,
 				})
 				continue
 			}
@@ -206,16 +201,20 @@ func (conv *astConverter) handleFormat(node *ast.Format) *Format {
 
 func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	c := astConverter{
-		Logger: logger,
-		Intrinsics: map[string]*IntrinsicType{
-			"vec2":      {Name: "vec2"},
-			"vec3":      {Name: "vec3"},
-			"vec4":      {Name: "vec4"},
-			"mat2":      {Name: "mat2"},
-			"mat3":      {Name: "mat3"},
-			"mat4":      {Name: "mat4"},
-			"sampler2D": {Name: "sampler2D"},
-		},
+		Logger:     logger,
+		Intrinsics: map[string]*IntrinsicType{},
+		Namespace:  map[string]TreeValue{},
+	}
+
+	for _, name := range []string{"vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "sampler2D"} {
+		it := &IntrinsicType{Name: name}
+		c.Intrinsics[name] = it
+		c.Namespace[name] = &TypeValue{Type: it}
+	}
+
+	for _, name := range []string{"texture2D"} {
+		f := &IntrinsicFunction{Name: name}
+		c.Namespace[name] = &FunctionValue{Function: f}
 	}
 
 	shaders := []*ShaderProgram{}
