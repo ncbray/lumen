@@ -17,9 +17,10 @@ type Type interface {
 }
 
 type Field struct {
-	Temp interface{}
-	Name string
-	Type Type
+	Temp   interface{}
+	Name   string
+	Type   Type
+	Marked bool
 }
 
 type Format struct {

@@ -18,6 +18,9 @@ func typeName(t Type) string {
 
 func generateFormat(name string, format *Format, o *writer.TabbedWriter) {
 	for _, f := range format.Fields {
+		if !f.Marked {
+			continue
+		}
 		o.WriteLine(name + " " + typeName(f.Type) + " " + f.Name + ";")
 	}
 }
@@ -90,7 +93,58 @@ func generateBody(f *Function, o *writer.TabbedWriter) {
 	o.WriteLine("}")
 }
 
+func clearMarks(format *Format) {
+	for _, f := range format.Fields {
+		f.Marked = false
+	}
+}
+
+func findUsedExpr(e Expr) {
+	switch e := e.(type) {
+	case *Number, *GetLocal:
+	case *GetInput:
+		e.Input.Marked = true
+	case *GetAttr:
+		findUsedExpr(e.Value)
+	case *Infix:
+		findUsedExpr(e.Left)
+		findUsedExpr(e.Right)
+	case *Constructor:
+		for _, arg := range e.Args {
+			findUsedExpr(arg)
+		}
+	case *CallIntrinsic:
+		for _, arg := range e.Args {
+			findUsedExpr(arg)
+		}
+	default:
+		panic(e)
+	}
+}
+
+func findUsed(s *ShaderProgram, f *Function) {
+	clearMarks(s.Uniform)
+	clearMarks(s.Attribute)
+	clearMarks(s.Varying)
+
+	for _, s := range f.Body {
+		switch s := s.(type) {
+		case *SetOutput:
+			s.Output.Marked = true
+			findUsedExpr(s.Value)
+		case *SetLocal:
+			findUsedExpr(s.Value)
+		case *Discard:
+			findUsedExpr(s.Value)
+		default:
+			panic(s)
+		}
+	}
+}
+
 func GenerateGLSLVertShader(s *ShaderProgram, declPrecision bool, out io.Writer) {
+	findUsed(s, s.Vs)
+
 	o := writer.MakeTabbedWriter("  ", out)
 	if declPrecision {
 		o.WriteLine("precision mediump float;")
@@ -102,6 +156,8 @@ func GenerateGLSLVertShader(s *ShaderProgram, declPrecision bool, out io.Writer)
 }
 
 func GenerateGLSLFragShader(s *ShaderProgram, declPrecision bool, out io.Writer) {
+	findUsed(s, s.Fs)
+
 	o := writer.MakeTabbedWriter("  ", out)
 	if declPrecision {
 		o.WriteLine("precision mediump float;")

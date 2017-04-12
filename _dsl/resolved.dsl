@@ -7,6 +7,7 @@ holder Type = IntrinsicType;
 struct Field {
   var Name string;
   var Type Type;
+  var Marked bool; // For analysis.
 }
 
 struct Format {
