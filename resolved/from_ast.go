@@ -39,21 +39,68 @@ func valueInfo(v TreeValue) string {
 	}
 }
 
-func (conv *astConverter) requireExpr(v TreeValue, loc util.Location) Expr {
+func (conv *astConverter) requireExpr(src ast.Expr, ok *bool) *ExprValue {
+	v, loc := conv.handleExpr(src)
 	switch v := v.(type) {
 	case *ExprValue:
-		return v.Expr
+		if len(v.Type) == 0 {
+			conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "tried to use a void expression")
+			*ok = false
+			return nil
+		}
+		return v
 	case *Poison:
 		// Error was reported elsewhere.
+		*ok = false
 		return nil
 	default:
 		desc := valueInfo(v)
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "expected an expression but got "+desc)
+		*ok = false
 		return nil
 	}
 }
 
+func (conv *astConverter) unwrapExprList(src []*ExprValue) []Expr {
+	dst := make([]Expr, len(src))
+	for i, v := range src {
+		dst[i] = v.Expr
+	}
+	return dst
+}
+
+func (conv *astConverter) checkSwizzleMask(mask string, vecLength int, loc util.Location) bool {
+	if len(mask) <= 0 || len(mask) > 4 {
+		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "swizzle mask must be between 1 and 4 characters")
+		return false
+	}
+	for _, c := range mask {
+		var swizzleIndex int
+		switch c {
+		case 'x', 'r':
+			swizzleIndex = 0
+		case 'y', 'g':
+			swizzleIndex = 1
+		case 'z', 'b':
+			swizzleIndex = 2
+		case 'w', 'a':
+			swizzleIndex = 3
+		default:
+			conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("unknown swizzle character %q", c))
+			return false
+		}
+		if swizzleIndex >= vecLength {
+			conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("attempted to access element %d of a %d element vector", swizzleIndex, vecLength))
+			return false
+		}
+		// TODO validate mixing xyzw with rgba.
+	}
+	return true
+}
+
 func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
+	subExprsOK := true
+
 	switch src := src.(type) {
 	case *ast.Number:
 		return &ExprValue{
@@ -91,44 +138,93 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot resolve name %q", name))
 		return &Poison{}, src.Loc
 	case *ast.GetAttr:
-		expr := conv.requireExpr(conv.handleExpr(src.Value))
+		expr := conv.requireExpr(src.Value, &subExprsOK)
+		if !subExprsOK {
+			return &Poison{}, src.Loc
+		}
+
+		vecLength := 0
+		switch expr.Type[0] {
+		case conv.Vec2:
+			vecLength = 2
+		case conv.Vec3:
+			vecLength = 3
+		case conv.Vec4:
+			vecLength = 4
+		default:
+			loc := src.Loc
+			conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, "cannot get attribute")
+			subExprsOK = false
+		}
+		if !subExprsOK {
+			return &Poison{}, src.Loc
+		}
+		if !conv.checkSwizzleMask(src.Name, vecLength, src.Loc) {
+			return &Poison{}, src.Loc
+		}
+		var swizzType Type
+		switch len(src.Name) {
+		case 1:
+			swizzType = conv.Float
+		case 2:
+			swizzType = conv.Vec2
+		case 3:
+			swizzType = conv.Vec3
+		case 4:
+			swizzType = conv.Vec4
+		default:
+			panic(src.Name)
+		}
 		return &ExprValue{
 			Expr: &GetAttr{
-				Value: expr,
+				Value: expr.Expr,
 				Name:  src.Name,
 			},
+			Type: []Type{swizzType},
 		}, src.Loc
 	case *ast.Infix:
-		left := conv.requireExpr(conv.handleExpr(src.Left))
-		right := conv.requireExpr(conv.handleExpr(src.Right))
+		left := conv.requireExpr(src.Left, &subExprsOK)
+		right := conv.requireExpr(src.Right, &subExprsOK)
+		if !subExprsOK {
+			return &Poison{}, src.Loc
+		}
 		return &ExprValue{
 			Expr: &Infix{
-				Left:  left,
+				Left:  left.Expr,
 				Op:    src.Op,
-				Right: right,
+				Right: right.Expr,
 			},
+			Type: left.Type, // HACK - should actually check types.
 		}, src.Loc
 	case *ast.Call:
 		value, loc := conv.handleExpr(src.Value)
-		args := make([]Expr, len(src.Args))
+		args := make([]*ExprValue, len(src.Args))
 		for i, arg := range src.Args {
-			args[i] = conv.requireExpr(conv.handleExpr(arg))
+			args[i] = conv.requireExpr(arg, &subExprsOK)
 		}
 
 		switch value := value.(type) {
 		case *TypeValue:
+			if !subExprsOK {
+				return &Poison{}, loc
+			}
 			return &ExprValue{
 				Expr: &Constructor{
 					Type: value.Type,
-					Args: args,
+					Args: conv.unwrapExprList(args),
 				},
+				Type: []Type{value.Type},
 			}, loc
 		case *FunctionValue:
+			if !subExprsOK {
+				return &Poison{}, loc
+			}
 			return &ExprValue{
 				Expr: &CallIntrinsic{
 					Function: value.Function,
-					Args:     args,
+					Args:     conv.unwrapExprList(args),
 				},
+				Type: value.Function.Signature.Returns,
 			}, loc
 		case *Poison:
 			return value, loc
@@ -163,9 +259,10 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 
 	dst := []Statement{}
 	for _, stmt := range src {
+		subExprsOK := true
 		switch stmt := stmt.(type) {
 		case *ast.VarDecl:
-			value := conv.requireExpr(conv.handleExpr(stmt.Value))
+			value := conv.requireExpr(stmt.Value, &subExprsOK)
 			// TODO type?
 			_, ok := conv.LocalLut[stmt.Name]
 			if ok {
@@ -176,25 +273,34 @@ func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLog
 			lcl := &Local{Name: stmt.Name, Type: t}
 			conv.Locals = append(conv.Locals, lcl)
 			conv.LocalLut[lcl.Name] = lcl
+			if !subExprsOK {
+				continue
+			}
 			dst = append(dst, &SetLocal{
 				Local: lcl,
-				Value: value,
+				Value: value.Expr,
 			})
 		case *ast.Assign:
-			value := conv.requireExpr(conv.handleExpr(stmt.Value))
+			value := conv.requireExpr(stmt.Value, &subExprsOK)
 			lcl, ok := conv.LocalLut[stmt.Name]
 			if ok {
+				if !subExprsOK {
+					continue
+				}
 				dst = append(dst, &SetLocal{
 					Local: lcl,
-					Value: value,
+					Value: value.Expr,
 				})
 				continue
 			}
 			outp, ok := conv.Outputs[stmt.Name]
 			if ok {
+				if !subExprsOK {
+					continue
+				}
 				dst = append(dst, &SetOutput{
 					Output: outp,
-					Value:  value,
+					Value:  value.Expr,
 				})
 				continue
 			}
