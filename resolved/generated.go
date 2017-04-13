@@ -91,9 +91,16 @@ type Constructor struct {
 func (n *Constructor) isExpr() {
 }
 
+type FunctionSignature struct {
+	Temp    interface{}
+	Params  []Type
+	Returns []Type
+}
+
 type IntrinsicFunction struct {
-	Temp interface{}
-	Name string
+	Temp      interface{}
+	Name      string
+	Signature *FunctionSignature
 }
 
 type CallIntrinsic struct {
@@ -112,7 +119,7 @@ type Expr interface {
 type ExprValue struct {
 	Temp interface{}
 	Expr Expr
-	Type Type
+	Type []Type
 }
 
 func (n *ExprValue) isTreeValue() {

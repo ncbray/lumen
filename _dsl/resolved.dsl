@@ -52,8 +52,14 @@ struct Constructor {
   var Args []Expr;
 }
 
+struct FunctionSignature {
+  var Params []Type;
+  var Returns []Type;
+}
+
 struct IntrinsicFunction {
   var Name string;
+  var Signature FunctionSignature;
 }
 
 struct CallIntrinsic {
@@ -65,7 +71,7 @@ holder Expr = GetInput | GetLocal | GetAttr | Number | Prefix | Infix | Construc
 
 struct ExprValue {
   var Expr Expr;
-  var Type Type;
+  var Type []Type;
 }
 
 struct TypeValue {

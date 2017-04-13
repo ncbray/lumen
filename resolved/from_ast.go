@@ -9,13 +9,21 @@ import (
 )
 
 type astConverter struct {
-	Logger     log.CompilerLogger
-	LocalLut   map[string]*Local
-	Locals     []*Local
-	Inputs     map[string]*Field
-	Outputs    map[string]*Field
-	Intrinsics map[string]*IntrinsicType
-	Namespace  map[string]TreeValue
+	Logger    log.CompilerLogger
+	LocalLut  map[string]*Local
+	Locals    []*Local
+	Inputs    map[string]*Field
+	Outputs   map[string]*Field
+	Namespace map[string]TreeValue
+
+	Float     *IntrinsicType
+	Vec2      *IntrinsicType
+	Vec3      *IntrinsicType
+	Vec4      *IntrinsicType
+	Mat2      *IntrinsicType
+	Mat3      *IntrinsicType
+	Mat4      *IntrinsicType
+	Sampler2D *IntrinsicType
 }
 
 func valueInfo(v TreeValue) string {
@@ -52,6 +60,7 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 			Expr: &Number{
 				Raw: src.Raw,
 			},
+			Type: []Type{conv.Float},
 		}, src.Loc
 	case *ast.GetName:
 		name := src.Name
@@ -61,6 +70,7 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 				Expr: &GetLocal{
 					Local: lcl,
 				},
+				Type: []Type{lcl.Type},
 			}, src.Loc
 		}
 		inp, ok := conv.Inputs[name]
@@ -69,6 +79,7 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 				Expr: &GetInput{
 					Input: inp,
 				},
+				Type: []Type{inp.Type},
 			}, src.Loc
 		}
 		tv, ok := conv.Namespace[name]
@@ -80,18 +91,21 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("cannot resolve name %q", name))
 		return &Poison{}, src.Loc
 	case *ast.GetAttr:
+		expr := conv.requireExpr(conv.handleExpr(src.Value))
 		return &ExprValue{
 			Expr: &GetAttr{
-				Value: conv.requireExpr(conv.handleExpr(src.Value)),
+				Value: expr,
 				Name:  src.Name,
 			},
 		}, src.Loc
 	case *ast.Infix:
+		left := conv.requireExpr(conv.handleExpr(src.Left))
+		right := conv.requireExpr(conv.handleExpr(src.Right))
 		return &ExprValue{
 			Expr: &Infix{
-				Left:  conv.requireExpr(conv.handleExpr(src.Left)),
+				Left:  left,
 				Op:    src.Op,
-				Right: conv.requireExpr(conv.handleExpr(src.Right)),
+				Right: right,
 			},
 		}, src.Loc
 	case *ast.Call:
@@ -128,13 +142,19 @@ func (conv *astConverter) handleExpr(src ast.Expr) (TreeValue, util.Location) {
 	}
 }
 
-// TODO eliminate this method.
 func (conv *astConverter) resolveTypeRef(name string, loc util.Location) Type {
-	t, ok := conv.Intrinsics[name]
+	v, ok := conv.Namespace[name]
 	if !ok {
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("unknown type %q", name))
 	}
-	return t
+	switch v := v.(type) {
+	case *TypeValue:
+		return v.Type
+	default:
+		desc := valueInfo(v)
+		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, desc+" is not a type")
+		return nil
+	}
 }
 
 func (conv *astConverter) handleBody(src []ast.Statement, logger log.CompilerLogger) ([]*Local, []Statement) {
@@ -199,23 +219,34 @@ func (conv *astConverter) handleFormat(node *ast.Format) *Format {
 	return &Format{Fields: fields}
 }
 
+func (conv *astConverter) declIntrinsicType(t *IntrinsicType) *IntrinsicType {
+	conv.Namespace[t.Name] = &TypeValue{Type: t}
+	return t
+}
+
 func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	c := astConverter{
-		Logger:     logger,
-		Intrinsics: map[string]*IntrinsicType{},
-		Namespace:  map[string]TreeValue{},
+		Logger:    logger,
+		Namespace: map[string]TreeValue{},
 	}
 
-	for _, name := range []string{"vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "sampler2D"} {
-		it := &IntrinsicType{Name: name}
-		c.Intrinsics[name] = it
-		c.Namespace[name] = &TypeValue{Type: it}
-	}
+	c.Float = c.declIntrinsicType(&IntrinsicType{Name: "float"})
+	c.Vec2 = c.declIntrinsicType(&IntrinsicType{Name: "vec2"})
+	c.Vec3 = c.declIntrinsicType(&IntrinsicType{Name: "vec3"})
+	c.Vec4 = c.declIntrinsicType(&IntrinsicType{Name: "vec4"})
+	c.Mat2 = c.declIntrinsicType(&IntrinsicType{Name: "mat2"})
+	c.Mat3 = c.declIntrinsicType(&IntrinsicType{Name: "mat3"})
+	c.Mat4 = c.declIntrinsicType(&IntrinsicType{Name: "mat4"})
+	c.Sampler2D = c.declIntrinsicType(&IntrinsicType{Name: "sampler2D"})
 
-	for _, name := range []string{"texture2D"} {
-		f := &IntrinsicFunction{Name: name}
-		c.Namespace[name] = &FunctionValue{Function: f}
+	f := &IntrinsicFunction{
+		Name: "texture2D",
+		Signature: &FunctionSignature{
+			Params:  []Type{c.Sampler2D, c.Vec2},
+			Returns: []Type{c.Vec4},
+		},
 	}
+	c.Namespace[f.Name] = &FunctionValue{Function: f}
 
 	shaders := []*ShaderProgram{}
 	for _, s := range src.Shaders {
@@ -231,7 +262,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			c.Inputs[f.Name] = f
 		}
 		c.Outputs = map[string]*Field{}
-		c.Outputs["gl_Position"] = &Field{Name: "gl_Position", Type: c.Intrinsics["vec4"]}
+		c.Outputs["gl_Position"] = &Field{Name: "gl_Position", Type: c.Vec4}
 		for _, f := range varying.Fields {
 			c.Outputs[f.Name] = f
 		}
@@ -251,7 +282,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 			c.Inputs[f.Name] = f
 		}
 		c.Outputs = map[string]*Field{}
-		c.Outputs["gl_FragColor"] = &Field{Name: "gl_FragColor", Type: c.Intrinsics["vec4"]}
+		c.Outputs["gl_FragColor"] = &Field{Name: "gl_FragColor", Type: c.Vec4}
 
 		locals, body = c.handleBody(s.Fs, logger)
 		fs := &Function{
