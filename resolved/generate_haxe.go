@@ -10,6 +10,28 @@ import (
 	"github.com/ncbray/lumen/glsl"
 )
 
+func glslTypeToHaxe(t Type) string {
+	switch t := t.(type) {
+	case *IntrinsicType:
+		switch t.Name {
+		case "float":
+			return "Float"
+		case "mat3":
+			return "Matrix3"
+		case "mat4":
+			return "Matrix4"
+		case "vec2":
+			return "Vector2"
+		case "vec4":
+			return "Vector4"
+		default:
+			panic(t.Name)
+		}
+	default:
+		panic(t)
+	}
+}
+
 func GenerateHaxe(pkg string, file *File, declPrecision bool, minify bool, out io.Writer) {
 	o := writer.MakeTabbedWriter("  ", out)
 
@@ -19,6 +41,10 @@ func GenerateHaxe(pkg string, file *File, declPrecision bool, minify bool, out i
 		"lime.graphics.opengl.GL",
 		"lime.graphics.opengl.GLProgram",
 		"lime.graphics.opengl.GLUniformLocation",
+		"lime.math.Matrix3",
+		"lime.math.Matrix4",
+		"lime.math.Vector2",
+		"lime.math.Vector4",
 		"mecha.graphics.state.RenderPipeline",
 	}
 
@@ -33,8 +59,11 @@ func GenerateHaxe(pkg string, file *File, declPrecision bool, minify bool, out i
 		var fs bytes.Buffer
 		GenerateGLSLFragShader(p, declPrecision, &fs)
 
+		shaderClassName := p.Name + "ShaderProgram"
+		uniformsClassName := p.Name + "ShaderUniforms"
+
 		o.EndOfLine()
-		o.WriteLine("class " + p.Name + "ShaderProgram {")
+		o.WriteLine("class " + shaderClassName + " {")
 		o.Indent()
 
 		uniformData := []*Field{}
@@ -96,9 +125,60 @@ func GenerateHaxe(pkg string, file *File, declPrecision bool, minify bool, out i
 		o.Dedent()
 		o.WriteLine("}")
 
+		o.EndOfLine()
+		o.WriteLine("public function createUniforms() {")
+		o.Indent()
+		o.WriteLine("return new " + uniformsClassName + "(this);")
 		o.Dedent()
 		o.WriteLine("}")
 
+		o.Dedent()
+		o.WriteLine("}")
+
+		o.EndOfLine()
+		o.WriteLine("class " + uniformsClassName + " {")
+		o.Indent()
+
+		o.WriteLine("private var prog:" + shaderClassName + ";")
+		for _, u := range uniformData {
+			ht := glslTypeToHaxe(u.Type)
+			init := "new " + ht + "()"
+			o.WriteLine("public var " + u.Name + ":" + ht + " = " + init + ";")
+		}
+
+		o.EndOfLine()
+		o.WriteLine("public function new(prog:" + shaderClassName + ") {")
+		o.Indent()
+		o.WriteLine("this.prog = prog;")
+		o.Dedent()
+		o.WriteLine("}")
+
+		o.EndOfLine()
+		o.WriteLine("public function bind() {")
+		o.Indent()
+		o.WriteLine("GL.useProgram(prog.program);")
+		for _, u := range uniformData {
+			n := u.Name
+			switch t := u.Type.(type) {
+			case *IntrinsicType:
+				switch t.Name {
+				case "mat4":
+					o.WriteLine("GL.uniformMatrix4fv(prog." + n + ", false, " + n + ");")
+				case "vec4":
+
+					o.WriteLine("GL.uniform4f(prog." + n + ", " + n + ".x, " + n + ".y, " + n + ".z, " + n + ".w);")
+				default:
+					panic(t.Name)
+				}
+			default:
+				panic(t)
+			}
+		}
+		o.Dedent()
+		o.WriteLine("}")
+
+		o.Dedent()
+		o.WriteLine("}")
 	}
 
 	o.EndOfLine()
