@@ -125,9 +125,34 @@ type ShaderDecl struct {
 	Fs        []Statement
 }
 
+func (n *ShaderDecl) isTopLevelDecl() {
+}
+
+type VertexComponent struct {
+	Temp     interface{}
+	Loc      util.Location
+	Name     string
+	Type     string
+	Encoding string
+}
+
+type VertexDecl struct {
+	Temp       interface{}
+	Loc        util.Location
+	Name       string
+	Components []*VertexComponent
+}
+
+func (n *VertexDecl) isTopLevelDecl() {
+}
+
+type TopLevelDecl interface {
+	isTopLevelDecl()
+}
+
 type File struct {
-	Temp    interface{}
-	Shaders []*ShaderDecl
+	Temp  interface{}
+	Decls []TopLevelDecl
 }
 
 type ASTConverter struct {
@@ -249,7 +274,29 @@ func (c *ASTConverter) ConvertStatementList(src []parser.IStatementContext) []St
 	return dst
 }
 
-func (c *ASTConverter) ConvertShaderDecl(ctx parser.IShaderDeclContext) *ShaderDecl {
+func (c *ASTConverter) ConvertVertexComponent(ctx parser.IVertexComponentContext) *VertexComponent {
+	switch ctx := ctx.(type) {
+	case *parser.VertexComponentContext:
+		return &VertexComponent{
+			Loc:      util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:     ctx.GetName().GetText(),
+			Type:     ctx.GetT().GetText(),
+			Encoding: ctx.GetEncoding().GetText(),
+		}
+	default:
+		panic(ctx)
+	}
+}
+
+func (c *ASTConverter) ConvertVertexComponentList(src []parser.IVertexComponentContext) []*VertexComponent {
+	dst := make([]*VertexComponent, len(src))
+	for i, child := range src {
+		dst[i] = c.ConvertVertexComponent(child)
+	}
+	return dst
+}
+
+func (c *ASTConverter) ConvertTopLevelDecl(ctx parser.ITopLevelDeclContext) TopLevelDecl {
 	switch ctx := ctx.(type) {
 	case *parser.ShaderDeclContext:
 		return &ShaderDecl{
@@ -261,15 +308,21 @@ func (c *ASTConverter) ConvertShaderDecl(ctx parser.IShaderDeclContext) *ShaderD
 			Vs:        c.ConvertStatementList(ctx.GetVs()),
 			Fs:        c.ConvertStatementList(ctx.GetFs()),
 		}
+	case *parser.VertexDeclContext:
+		return &VertexDecl{
+			Loc:        util.GetLocation(c.Filename, ctx.GetStart()),
+			Name:       ctx.GetName().GetText(),
+			Components: c.ConvertVertexComponentList(ctx.GetComponents()),
+		}
 	default:
 		panic(ctx)
 	}
 }
 
-func (c *ASTConverter) ConvertShaderDeclList(src []parser.IShaderDeclContext) []*ShaderDecl {
-	dst := make([]*ShaderDecl, len(src))
+func (c *ASTConverter) ConvertTopLevelDeclList(src []parser.ITopLevelDeclContext) []TopLevelDecl {
+	dst := make([]TopLevelDecl, len(src))
 	for i, child := range src {
-		dst[i] = c.ConvertShaderDecl(child)
+		dst[i] = c.ConvertTopLevelDecl(child)
 	}
 	return dst
 }
@@ -278,7 +331,7 @@ func (c *ASTConverter) ConvertFile(ctx parser.IFileContext) *File {
 	switch ctx := ctx.(type) {
 	case *parser.FileContext:
 		return &File{
-			Shaders: c.ConvertShaderDeclList(ctx.GetShaders()),
+			Decls: c.ConvertTopLevelDeclList(ctx.GetDecls()),
 		}
 	default:
 		panic(ctx)

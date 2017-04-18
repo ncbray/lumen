@@ -33,18 +33,23 @@ format
   : '{' (fields+=field)* '}'
   ;
 
-shaderDecl
+vertexComponent
+  : name=ID t=ID encoding=ID ';'
+  ;
+
+topLevelDecl
   : 'shader' name=ID '{'
       'uniform' uniform=format
       'attribute' attribute=format
       'varying' varying=format
       'vs' '{' (vs+=statement)* '}'
       'fs' '{' (fs+=statement)* '}'
-    '}'
+    '}' # shaderDecl
+  | 'vertex' name=ID '{' (components+=vertexComponent)* '}' # vertexDecl
   ;
 
 file
-  : (shaders+=shaderDecl)*
+  : (decls+=topLevelDecl)*
   ;
 
 NUM: [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)?;

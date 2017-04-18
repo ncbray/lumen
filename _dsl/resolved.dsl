@@ -1,8 +1,21 @@
-struct IntrinsicType {
+struct ScalarType {
   var Name string;
 }
 
-holder Type = IntrinsicType;
+struct VectorType {
+  var Name string;
+  var Width int;
+  var Scalar ScalarType;
+}
+
+struct MatrixType {
+  var Name string;
+  var Width int;
+  var Height int;
+  var Scalar ScalarType;
+}
+
+holder Type = ScalarType | VectorType | MatrixType;
 
 struct Field {
   var Name string;
@@ -119,6 +132,23 @@ struct ShaderProgram {
   var Vs Function;
 }
 
+struct VertexComponent {
+  var Name string;
+  var Type Type;
+  var Encoding string; // TODO turn into enumeration?
+
+  var ByteOffset int;
+  var ByteSize int;
+}
+
+struct VertexFormat {
+  var Name string;
+  var Components []VertexComponent;
+
+  var ByteSize int;
+}
+
 struct File {
+  var Vertex []VertexFormat;
   var Programs []ShaderProgram;
 }

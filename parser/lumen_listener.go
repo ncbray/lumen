@@ -41,8 +41,14 @@ type LumenListener interface {
 	// EnterFormat is called when entering the format production.
 	EnterFormat(c *FormatContext)
 
+	// EnterVertexComponent is called when entering the vertexComponent production.
+	EnterVertexComponent(c *VertexComponentContext)
+
 	// EnterShaderDecl is called when entering the shaderDecl production.
 	EnterShaderDecl(c *ShaderDeclContext)
+
+	// EnterVertexDecl is called when entering the vertexDecl production.
+	EnterVertexDecl(c *VertexDeclContext)
 
 	// EnterFile is called when entering the file production.
 	EnterFile(c *FileContext)
@@ -80,8 +86,14 @@ type LumenListener interface {
 	// ExitFormat is called when exiting the format production.
 	ExitFormat(c *FormatContext)
 
+	// ExitVertexComponent is called when exiting the vertexComponent production.
+	ExitVertexComponent(c *VertexComponentContext)
+
 	// ExitShaderDecl is called when exiting the shaderDecl production.
 	ExitShaderDecl(c *ShaderDeclContext)
+
+	// ExitVertexDecl is called when exiting the vertexDecl production.
+	ExitVertexDecl(c *VertexDeclContext)
 
 	// ExitFile is called when exiting the file production.
 	ExitFile(c *FileContext)

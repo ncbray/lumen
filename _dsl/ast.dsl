@@ -76,8 +76,23 @@ struct ShaderDecl {
   var Fs []Statement;
 }
 
+struct VertexComponent {
+  var Loc location;
+  var Name string;
+  var Type string;
+  var Encoding string;
+}
+
+struct VertexDecl {
+  var Loc location;
+  var Name string;
+  var Components []VertexComponent;
+}
+
+holder TopLevelDecl = ShaderDecl | VertexDecl;
+
 struct File {
-  var Shaders []ShaderDecl;
+  var Decls []TopLevelDecl;
 }
 
 parser {
@@ -100,8 +115,11 @@ parser {
     assign(name string, value expr) => Assign{Loc: loc_start, Name: name, Value: value}
     discard(value expr) => Discard{Value: value}
   }
-  shaderDecl:ShaderDecl {
-    default(name string, uniform format, attribute format, varying format, vs []statement, fs []statement) => ShaderDecl{
+  vertexComponent:VertexComponent {
+    default(name string, t string, encoding string) => VertexComponent{Loc: loc_start, Name: name, Type: t, Encoding: encoding}
+  }
+  topLevelDecl:TopLevelDecl {
+    shaderDecl(name string, uniform format, attribute format, varying format, vs []statement, fs []statement) => ShaderDecl{
         Loc: loc_start,
         Name: name,
         Uniform: uniform,
@@ -109,8 +127,9 @@ parser {
         Varying: varying,
         Vs: vs,
         Fs: fs}
+    vertexDecl(name string, components []vertexComponent) => VertexDecl{Loc: loc_start, Name: name, Components: components}
   }
   file:File {
-    default(shaders []shaderDecl) => File{Shaders: shaders}
+    default(decls []topLevelDecl) => File{Decls: decls}
   }
 }

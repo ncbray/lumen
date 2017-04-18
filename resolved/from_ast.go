@@ -16,14 +16,14 @@ type astConverter struct {
 	Outputs   map[string]*Field
 	Namespace map[string]TreeValue
 
-	Float     *IntrinsicType
-	Vec2      *IntrinsicType
-	Vec3      *IntrinsicType
-	Vec4      *IntrinsicType
-	Mat2      *IntrinsicType
-	Mat3      *IntrinsicType
-	Mat4      *IntrinsicType
-	Sampler2D *IntrinsicType
+	Float     *ScalarType
+	Vec2      *VectorType
+	Vec3      *VectorType
+	Vec4      *VectorType
+	Mat2      *MatrixType
+	Mat3      *MatrixType
+	Mat4      *MatrixType
+	Sampler2D *ScalarType
 }
 
 func valueInfo(v TreeValue) string {
@@ -242,6 +242,7 @@ func (conv *astConverter) resolveTypeRef(name string, loc util.Location) Type {
 	v, ok := conv.Namespace[name]
 	if !ok {
 		conv.Logger.ErrorAtLocation(loc.File, loc.Line, loc.Column, fmt.Sprintf("unknown type %q", name))
+		return nil
 	}
 	switch v := v.(type) {
 	case *TypeValue:
@@ -325,9 +326,8 @@ func (conv *astConverter) handleFormat(node *ast.Format) *Format {
 	return &Format{Fields: fields}
 }
 
-func (conv *astConverter) declIntrinsicType(t *IntrinsicType) *IntrinsicType {
-	conv.Namespace[t.Name] = &TypeValue{Type: t}
-	return t
+func (conv *astConverter) declType(name string, t Type) {
+	conv.Namespace[name] = &TypeValue{Type: t}
 }
 
 func FromAST(src *ast.File, logger log.CompilerLogger) *File {
@@ -336,14 +336,25 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 		Namespace: map[string]TreeValue{},
 	}
 
-	c.Float = c.declIntrinsicType(&IntrinsicType{Name: "float"})
-	c.Vec2 = c.declIntrinsicType(&IntrinsicType{Name: "vec2"})
-	c.Vec3 = c.declIntrinsicType(&IntrinsicType{Name: "vec3"})
-	c.Vec4 = c.declIntrinsicType(&IntrinsicType{Name: "vec4"})
-	c.Mat2 = c.declIntrinsicType(&IntrinsicType{Name: "mat2"})
-	c.Mat3 = c.declIntrinsicType(&IntrinsicType{Name: "mat3"})
-	c.Mat4 = c.declIntrinsicType(&IntrinsicType{Name: "mat4"})
-	c.Sampler2D = c.declIntrinsicType(&IntrinsicType{Name: "sampler2D"})
+	c.Float = &ScalarType{Name: "float"}
+	c.declType(c.Float.Name, c.Float)
+
+	c.Vec2 = &VectorType{Name: "vec2", Width: 2, Scalar: c.Float}
+	c.declType(c.Vec2.Name, c.Vec2)
+	c.Vec3 = &VectorType{Name: "vec3", Width: 3, Scalar: c.Float}
+	c.declType(c.Vec3.Name, c.Vec3)
+	c.Vec4 = &VectorType{Name: "vec4", Width: 4, Scalar: c.Float}
+	c.declType(c.Vec4.Name, c.Vec4)
+
+	c.Mat2 = &MatrixType{Name: "mat2", Width: 2, Height: 2, Scalar: c.Float}
+	c.declType(c.Mat2.Name, c.Mat2)
+	c.Mat3 = &MatrixType{Name: "mat3", Width: 3, Height: 3, Scalar: c.Float}
+	c.declType(c.Mat3.Name, c.Mat3)
+	c.Mat4 = &MatrixType{Name: "mat4", Width: 4, Height: 4, Scalar: c.Float}
+	c.declType(c.Mat4.Name, c.Mat4)
+
+	c.Sampler2D = &ScalarType{Name: "sampler2D"}
+	c.declType(c.Sampler2D.Name, c.Sampler2D)
 
 	f := &IntrinsicFunction{
 		Name: "texture2D",
@@ -354,59 +365,80 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 	}
 	c.Namespace[f.Name] = &FunctionValue{Function: f}
 
+	vertex := []*VertexFormat{}
 	shaders := []*ShaderProgram{}
-	for _, s := range src.Shaders {
-		uniform := c.handleFormat(s.Uniform)
-		attribute := c.handleFormat(s.Attribute)
-		varying := c.handleFormat(s.Varying)
+	for _, d := range src.Decls {
+		switch d := d.(type) {
+		case *ast.VertexDecl:
+			components := []*VertexComponent{}
+			for _, comp := range d.Components {
+				t := c.resolveTypeRef(comp.Type, comp.Loc)
+				components = append(components, &VertexComponent{
+					Name:     comp.Name,
+					Type:     t,
+					Encoding: comp.Encoding, // TODO validate.
+				})
+			}
+			vertex = append(vertex, &VertexFormat{
+				Name:       d.Name,
+				Components: components,
+			})
+		case *ast.ShaderDecl:
+			uniform := c.handleFormat(d.Uniform)
+			attribute := c.handleFormat(d.Attribute)
+			varying := c.handleFormat(d.Varying)
 
-		c.Inputs = map[string]*Field{}
-		for _, f := range uniform.Fields {
-			c.Inputs[f.Name] = f
-		}
-		for _, f := range attribute.Fields {
-			c.Inputs[f.Name] = f
-		}
-		c.Outputs = map[string]*Field{}
-		c.Outputs["gl_Position"] = &Field{Name: "gl_Position", Type: c.Vec4}
-		for _, f := range varying.Fields {
-			c.Outputs[f.Name] = f
-		}
+			c.Inputs = map[string]*Field{}
+			for _, f := range uniform.Fields {
+				c.Inputs[f.Name] = f
+			}
+			for _, f := range attribute.Fields {
+				c.Inputs[f.Name] = f
+			}
+			c.Outputs = map[string]*Field{}
+			c.Outputs["gl_Position"] = &Field{Name: "gl_Position", Type: c.Vec4}
+			for _, f := range varying.Fields {
+				c.Outputs[f.Name] = f
+			}
 
-		locals, body := c.handleBody(s.Vs, logger)
-		vs := &Function{
-			Name:   "main",
-			Locals: locals,
-			Body:   body,
-		}
+			locals, body := c.handleBody(d.Vs, logger)
+			vs := &Function{
+				Name:   "main",
+				Locals: locals,
+				Body:   body,
+			}
 
-		c.Inputs = map[string]*Field{}
-		for _, f := range uniform.Fields {
-			c.Inputs[f.Name] = f
-		}
-		for _, f := range varying.Fields {
-			c.Inputs[f.Name] = f
-		}
-		c.Outputs = map[string]*Field{}
-		c.Outputs["gl_FragColor"] = &Field{Name: "gl_FragColor", Type: c.Vec4}
+			c.Inputs = map[string]*Field{}
+			for _, f := range uniform.Fields {
+				c.Inputs[f.Name] = f
+			}
+			for _, f := range varying.Fields {
+				c.Inputs[f.Name] = f
+			}
+			c.Outputs = map[string]*Field{}
+			c.Outputs["gl_FragColor"] = &Field{Name: "gl_FragColor", Type: c.Vec4}
 
-		locals, body = c.handleBody(s.Fs, logger)
-		fs := &Function{
-			Name:   "main",
-			Locals: locals,
-			Body:   body,
-		}
+			locals, body = c.handleBody(d.Fs, logger)
+			fs := &Function{
+				Name:   "main",
+				Locals: locals,
+				Body:   body,
+			}
 
-		shaders = append(shaders, &ShaderProgram{
-			Name:      s.Name,
-			Uniform:   uniform,
-			Attribute: attribute,
-			Varying:   varying,
-			Vs:        vs,
-			Fs:        fs,
-		})
+			shaders = append(shaders, &ShaderProgram{
+				Name:      d.Name,
+				Uniform:   uniform,
+				Attribute: attribute,
+				Varying:   varying,
+				Vs:        vs,
+				Fs:        fs,
+			})
+		default:
+			panic(d)
+		}
 	}
 	return &File{
+		Vertex:   vertex,
 		Programs: shaders,
 	}
 }

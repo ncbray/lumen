@@ -87,11 +87,23 @@ func (s *BaseLumenListener) EnterFormat(ctx *FormatContext) {}
 // ExitFormat is called when production format is exited.
 func (s *BaseLumenListener) ExitFormat(ctx *FormatContext) {}
 
+// EnterVertexComponent is called when production vertexComponent is entered.
+func (s *BaseLumenListener) EnterVertexComponent(ctx *VertexComponentContext) {}
+
+// ExitVertexComponent is called when production vertexComponent is exited.
+func (s *BaseLumenListener) ExitVertexComponent(ctx *VertexComponentContext) {}
+
 // EnterShaderDecl is called when production shaderDecl is entered.
 func (s *BaseLumenListener) EnterShaderDecl(ctx *ShaderDeclContext) {}
 
 // ExitShaderDecl is called when production shaderDecl is exited.
 func (s *BaseLumenListener) ExitShaderDecl(ctx *ShaderDeclContext) {}
+
+// EnterVertexDecl is called when production vertexDecl is entered.
+func (s *BaseLumenListener) EnterVertexDecl(ctx *VertexDeclContext) {}
+
+// ExitVertexDecl is called when production vertexDecl is exited.
+func (s *BaseLumenListener) ExitVertexDecl(ctx *VertexDeclContext) {}
 
 // EnterFile is called when production file is entered.
 func (s *BaseLumenListener) EnterFile(ctx *FileContext) {}

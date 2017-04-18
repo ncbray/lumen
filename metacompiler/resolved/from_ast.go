@@ -258,6 +258,7 @@ func FromAST(src *ast.File, logger log.CompilerLogger) *File {
 		parent: nil,
 		types: map[string]Type{
 			"string":   &IntrinsicType{Name: "string"},
+			"int":      &IntrinsicType{Name: "int"},
 			"bool":     &IntrinsicType{Name: "bool"},
 			"location": &IntrinsicType{Name: "location"},
 		},

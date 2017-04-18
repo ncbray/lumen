@@ -1,11 +1,32 @@
 package resolved
 
-type IntrinsicType struct {
+type ScalarType struct {
 	Temp interface{}
 	Name string
 }
 
-func (n *IntrinsicType) isType() {
+func (n *ScalarType) isType() {
+}
+
+type VectorType struct {
+	Temp   interface{}
+	Name   string
+	Width  int
+	Scalar *ScalarType
+}
+
+func (n *VectorType) isType() {
+}
+
+type MatrixType struct {
+	Temp   interface{}
+	Name   string
+	Width  int
+	Height int
+	Scalar *ScalarType
+}
+
+func (n *MatrixType) isType() {
 }
 
 type Type interface {
@@ -199,7 +220,24 @@ type ShaderProgram struct {
 	Vs        *Function
 }
 
+type VertexComponent struct {
+	Temp       interface{}
+	Name       string
+	Type       Type
+	Encoding   string
+	ByteOffset int
+	ByteSize   int
+}
+
+type VertexFormat struct {
+	Temp       interface{}
+	Name       string
+	Components []*VertexComponent
+	ByteSize   int
+}
+
 type File struct {
 	Temp     interface{}
+	Vertex   []*VertexFormat
 	Programs []*ShaderProgram
 }

@@ -16,66 +16,74 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 40, 137, 4,
-	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 3,
-	2, 3, 2, 3, 2, 3, 2, 3, 2, 5, 2, 20, 10, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3,
+	3, 1072, 54993, 33286, 44333, 17431, 44785, 36224, 43741, 3, 41, 156, 4,
+	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
+	8, 9, 8, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 5, 2, 22, 10, 2, 3, 2, 3, 2, 3,
 	2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3,
 	2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3,
-	2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 7, 2, 57, 10, 2, 12, 2, 14, 2, 60,
-	11, 2, 5, 2, 62, 10, 2, 3, 2, 3, 2, 3, 2, 3, 2, 7, 2, 68, 10, 2, 12, 2,
-	14, 2, 71, 11, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 87, 10, 3, 3, 4, 3, 4, 3, 4, 3, 4,
-	3, 5, 3, 5, 7, 5, 95, 10, 5, 12, 5, 14, 5, 98, 11, 5, 3, 5, 3, 5, 3, 6,
-	3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 7, 6,
-	114, 10, 6, 12, 6, 14, 6, 117, 11, 6, 3, 6, 3, 6, 3, 6, 3, 6, 7, 6, 123,
-	10, 6, 12, 6, 14, 6, 126, 11, 6, 3, 6, 3, 6, 3, 6, 3, 7, 7, 7, 132, 10,
-	7, 12, 7, 14, 7, 135, 11, 7, 3, 7, 2, 3, 2, 8, 2, 4, 6, 8, 10, 12, 2, 8,
-	3, 2, 7, 10, 3, 2, 11, 13, 3, 2, 7, 8, 3, 2, 14, 15, 3, 2, 16, 19, 3, 2,
-	20, 21, 152, 2, 19, 3, 2, 2, 2, 4, 86, 3, 2, 2, 2, 6, 88, 3, 2, 2, 2, 8,
-	92, 3, 2, 2, 2, 10, 101, 3, 2, 2, 2, 12, 133, 3, 2, 2, 2, 14, 15, 8, 2,
-	1, 2, 15, 16, 9, 2, 2, 2, 16, 20, 5, 2, 2, 15, 17, 20, 7, 38, 2, 2, 18,
-	20, 7, 37, 2, 2, 19, 14, 3, 2, 2, 2, 19, 17, 3, 2, 2, 2, 19, 18, 3, 2,
-	2, 2, 20, 69, 3, 2, 2, 2, 21, 22, 12, 14, 2, 2, 22, 23, 9, 3, 2, 2, 23,
-	68, 5, 2, 2, 15, 24, 25, 12, 13, 2, 2, 25, 26, 9, 4, 2, 2, 26, 68, 5, 2,
-	2, 14, 27, 28, 12, 12, 2, 2, 28, 29, 9, 5, 2, 2, 29, 68, 5, 2, 2, 13, 30,
-	31, 12, 11, 2, 2, 31, 32, 9, 6, 2, 2, 32, 68, 5, 2, 2, 12, 33, 34, 12,
-	10, 2, 2, 34, 35, 9, 7, 2, 2, 35, 68, 5, 2, 2, 11, 36, 37, 12, 9, 2, 2,
-	37, 38, 7, 22, 2, 2, 38, 68, 5, 2, 2, 10, 39, 40, 12, 8, 2, 2, 40, 41,
-	7, 23, 2, 2, 41, 68, 5, 2, 2, 9, 42, 43, 12, 7, 2, 2, 43, 44, 7, 24, 2,
-	2, 44, 68, 5, 2, 2, 8, 45, 46, 12, 6, 2, 2, 46, 47, 7, 25, 2, 2, 47, 68,
-	5, 2, 2, 7, 48, 49, 12, 5, 2, 2, 49, 50, 7, 26, 2, 2, 50, 68, 5, 2, 2,
-	6, 51, 52, 12, 17, 2, 2, 52, 61, 7, 3, 2, 2, 53, 58, 5, 2, 2, 2, 54, 55,
-	7, 4, 2, 2, 55, 57, 5, 2, 2, 2, 56, 54, 3, 2, 2, 2, 57, 60, 3, 2, 2, 2,
-	58, 56, 3, 2, 2, 2, 58, 59, 3, 2, 2, 2, 59, 62, 3, 2, 2, 2, 60, 58, 3,
-	2, 2, 2, 61, 53, 3, 2, 2, 2, 61, 62, 3, 2, 2, 2, 62, 63, 3, 2, 2, 2, 63,
-	68, 7, 5, 2, 2, 64, 65, 12, 16, 2, 2, 65, 66, 7, 6, 2, 2, 66, 68, 7, 38,
-	2, 2, 67, 21, 3, 2, 2, 2, 67, 24, 3, 2, 2, 2, 67, 27, 3, 2, 2, 2, 67, 30,
-	3, 2, 2, 2, 67, 33, 3, 2, 2, 2, 67, 36, 3, 2, 2, 2, 67, 39, 3, 2, 2, 2,
-	67, 42, 3, 2, 2, 2, 67, 45, 3, 2, 2, 2, 67, 48, 3, 2, 2, 2, 67, 51, 3,
-	2, 2, 2, 67, 64, 3, 2, 2, 2, 68, 71, 3, 2, 2, 2, 69, 67, 3, 2, 2, 2, 69,
-	70, 3, 2, 2, 2, 70, 3, 3, 2, 2, 2, 71, 69, 3, 2, 2, 2, 72, 73, 7, 38, 2,
-	2, 73, 74, 7, 38, 2, 2, 74, 75, 7, 27, 2, 2, 75, 76, 5, 2, 2, 2, 76, 77,
-	7, 28, 2, 2, 77, 87, 3, 2, 2, 2, 78, 79, 7, 38, 2, 2, 79, 80, 7, 27, 2,
-	2, 80, 81, 5, 2, 2, 2, 81, 82, 7, 28, 2, 2, 82, 87, 3, 2, 2, 2, 83, 84,
-	5, 2, 2, 2, 84, 85, 7, 28, 2, 2, 85, 87, 3, 2, 2, 2, 86, 72, 3, 2, 2, 2,
-	86, 78, 3, 2, 2, 2, 86, 83, 3, 2, 2, 2, 87, 5, 3, 2, 2, 2, 88, 89, 7, 38,
-	2, 2, 89, 90, 7, 38, 2, 2, 90, 91, 7, 28, 2, 2, 91, 7, 3, 2, 2, 2, 92,
-	96, 7, 29, 2, 2, 93, 95, 5, 6, 4, 2, 94, 93, 3, 2, 2, 2, 95, 98, 3, 2,
-	2, 2, 96, 94, 3, 2, 2, 2, 96, 97, 3, 2, 2, 2, 97, 99, 3, 2, 2, 2, 98, 96,
-	3, 2, 2, 2, 99, 100, 7, 30, 2, 2, 100, 9, 3, 2, 2, 2, 101, 102, 7, 31,
-	2, 2, 102, 103, 7, 38, 2, 2, 103, 104, 7, 29, 2, 2, 104, 105, 7, 32, 2,
-	2, 105, 106, 5, 8, 5, 2, 106, 107, 7, 33, 2, 2, 107, 108, 5, 8, 5, 2, 108,
-	109, 7, 34, 2, 2, 109, 110, 5, 8, 5, 2, 110, 111, 7, 35, 2, 2, 111, 115,
-	7, 29, 2, 2, 112, 114, 5, 4, 3, 2, 113, 112, 3, 2, 2, 2, 114, 117, 3, 2,
-	2, 2, 115, 113, 3, 2, 2, 2, 115, 116, 3, 2, 2, 2, 116, 118, 3, 2, 2, 2,
-	117, 115, 3, 2, 2, 2, 118, 119, 7, 30, 2, 2, 119, 120, 7, 36, 2, 2, 120,
-	124, 7, 29, 2, 2, 121, 123, 5, 4, 3, 2, 122, 121, 3, 2, 2, 2, 123, 126,
-	3, 2, 2, 2, 124, 122, 3, 2, 2, 2, 124, 125, 3, 2, 2, 2, 125, 127, 3, 2,
-	2, 2, 126, 124, 3, 2, 2, 2, 127, 128, 7, 30, 2, 2, 128, 129, 7, 30, 2,
-	2, 129, 11, 3, 2, 2, 2, 130, 132, 5, 10, 6, 2, 131, 130, 3, 2, 2, 2, 132,
-	135, 3, 2, 2, 2, 133, 131, 3, 2, 2, 2, 133, 134, 3, 2, 2, 2, 134, 13, 3,
-	2, 2, 2, 135, 133, 3, 2, 2, 2, 12, 19, 58, 61, 67, 69, 86, 96, 115, 124,
-	133,
+	2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 7, 2, 59, 10, 2, 12,
+	2, 14, 2, 62, 11, 2, 5, 2, 64, 10, 2, 3, 2, 3, 2, 3, 2, 3, 2, 7, 2, 70,
+	10, 2, 12, 2, 14, 2, 73, 11, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 89, 10, 3, 3, 4, 3,
+	4, 3, 4, 3, 4, 3, 5, 3, 5, 7, 5, 97, 10, 5, 12, 5, 14, 5, 100, 11, 5, 3,
+	5, 3, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3,
+	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 121, 10, 7, 12, 7, 14, 7,
+	124, 11, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 130, 10, 7, 12, 7, 14, 7, 133,
+	11, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 142, 10, 7, 12,
+	7, 14, 7, 145, 11, 7, 3, 7, 5, 7, 148, 10, 7, 3, 8, 7, 8, 151, 10, 8, 12,
+	8, 14, 8, 154, 11, 8, 3, 8, 2, 3, 2, 9, 2, 4, 6, 8, 10, 12, 14, 2, 8, 3,
+	2, 7, 10, 3, 2, 11, 13, 3, 2, 7, 8, 3, 2, 14, 15, 3, 2, 16, 19, 3, 2, 20,
+	21, 172, 2, 21, 3, 2, 2, 2, 4, 88, 3, 2, 2, 2, 6, 90, 3, 2, 2, 2, 8, 94,
+	3, 2, 2, 2, 10, 103, 3, 2, 2, 2, 12, 147, 3, 2, 2, 2, 14, 152, 3, 2, 2,
+	2, 16, 17, 8, 2, 1, 2, 17, 18, 9, 2, 2, 2, 18, 22, 5, 2, 2, 15, 19, 22,
+	7, 39, 2, 2, 20, 22, 7, 38, 2, 2, 21, 16, 3, 2, 2, 2, 21, 19, 3, 2, 2,
+	2, 21, 20, 3, 2, 2, 2, 22, 71, 3, 2, 2, 2, 23, 24, 12, 14, 2, 2, 24, 25,
+	9, 3, 2, 2, 25, 70, 5, 2, 2, 15, 26, 27, 12, 13, 2, 2, 27, 28, 9, 4, 2,
+	2, 28, 70, 5, 2, 2, 14, 29, 30, 12, 12, 2, 2, 30, 31, 9, 5, 2, 2, 31, 70,
+	5, 2, 2, 13, 32, 33, 12, 11, 2, 2, 33, 34, 9, 6, 2, 2, 34, 70, 5, 2, 2,
+	12, 35, 36, 12, 10, 2, 2, 36, 37, 9, 7, 2, 2, 37, 70, 5, 2, 2, 11, 38,
+	39, 12, 9, 2, 2, 39, 40, 7, 22, 2, 2, 40, 70, 5, 2, 2, 10, 41, 42, 12,
+	8, 2, 2, 42, 43, 7, 23, 2, 2, 43, 70, 5, 2, 2, 9, 44, 45, 12, 7, 2, 2,
+	45, 46, 7, 24, 2, 2, 46, 70, 5, 2, 2, 8, 47, 48, 12, 6, 2, 2, 48, 49, 7,
+	25, 2, 2, 49, 70, 5, 2, 2, 7, 50, 51, 12, 5, 2, 2, 51, 52, 7, 26, 2, 2,
+	52, 70, 5, 2, 2, 6, 53, 54, 12, 17, 2, 2, 54, 63, 7, 3, 2, 2, 55, 60, 5,
+	2, 2, 2, 56, 57, 7, 4, 2, 2, 57, 59, 5, 2, 2, 2, 58, 56, 3, 2, 2, 2, 59,
+	62, 3, 2, 2, 2, 60, 58, 3, 2, 2, 2, 60, 61, 3, 2, 2, 2, 61, 64, 3, 2, 2,
+	2, 62, 60, 3, 2, 2, 2, 63, 55, 3, 2, 2, 2, 63, 64, 3, 2, 2, 2, 64, 65,
+	3, 2, 2, 2, 65, 70, 7, 5, 2, 2, 66, 67, 12, 16, 2, 2, 67, 68, 7, 6, 2,
+	2, 68, 70, 7, 39, 2, 2, 69, 23, 3, 2, 2, 2, 69, 26, 3, 2, 2, 2, 69, 29,
+	3, 2, 2, 2, 69, 32, 3, 2, 2, 2, 69, 35, 3, 2, 2, 2, 69, 38, 3, 2, 2, 2,
+	69, 41, 3, 2, 2, 2, 69, 44, 3, 2, 2, 2, 69, 47, 3, 2, 2, 2, 69, 50, 3,
+	2, 2, 2, 69, 53, 3, 2, 2, 2, 69, 66, 3, 2, 2, 2, 70, 73, 3, 2, 2, 2, 71,
+	69, 3, 2, 2, 2, 71, 72, 3, 2, 2, 2, 72, 3, 3, 2, 2, 2, 73, 71, 3, 2, 2,
+	2, 74, 75, 7, 39, 2, 2, 75, 76, 7, 39, 2, 2, 76, 77, 7, 27, 2, 2, 77, 78,
+	5, 2, 2, 2, 78, 79, 7, 28, 2, 2, 79, 89, 3, 2, 2, 2, 80, 81, 7, 39, 2,
+	2, 81, 82, 7, 27, 2, 2, 82, 83, 5, 2, 2, 2, 83, 84, 7, 28, 2, 2, 84, 89,
+	3, 2, 2, 2, 85, 86, 5, 2, 2, 2, 86, 87, 7, 28, 2, 2, 87, 89, 3, 2, 2, 2,
+	88, 74, 3, 2, 2, 2, 88, 80, 3, 2, 2, 2, 88, 85, 3, 2, 2, 2, 89, 5, 3, 2,
+	2, 2, 90, 91, 7, 39, 2, 2, 91, 92, 7, 39, 2, 2, 92, 93, 7, 28, 2, 2, 93,
+	7, 3, 2, 2, 2, 94, 98, 7, 29, 2, 2, 95, 97, 5, 6, 4, 2, 96, 95, 3, 2, 2,
+	2, 97, 100, 3, 2, 2, 2, 98, 96, 3, 2, 2, 2, 98, 99, 3, 2, 2, 2, 99, 101,
+	3, 2, 2, 2, 100, 98, 3, 2, 2, 2, 101, 102, 7, 30, 2, 2, 102, 9, 3, 2, 2,
+	2, 103, 104, 7, 39, 2, 2, 104, 105, 7, 39, 2, 2, 105, 106, 7, 39, 2, 2,
+	106, 107, 7, 28, 2, 2, 107, 11, 3, 2, 2, 2, 108, 109, 7, 31, 2, 2, 109,
+	110, 7, 39, 2, 2, 110, 111, 7, 29, 2, 2, 111, 112, 7, 32, 2, 2, 112, 113,
+	5, 8, 5, 2, 113, 114, 7, 33, 2, 2, 114, 115, 5, 8, 5, 2, 115, 116, 7, 34,
+	2, 2, 116, 117, 5, 8, 5, 2, 117, 118, 7, 35, 2, 2, 118, 122, 7, 29, 2,
+	2, 119, 121, 5, 4, 3, 2, 120, 119, 3, 2, 2, 2, 121, 124, 3, 2, 2, 2, 122,
+	120, 3, 2, 2, 2, 122, 123, 3, 2, 2, 2, 123, 125, 3, 2, 2, 2, 124, 122,
+	3, 2, 2, 2, 125, 126, 7, 30, 2, 2, 126, 127, 7, 36, 2, 2, 127, 131, 7,
+	29, 2, 2, 128, 130, 5, 4, 3, 2, 129, 128, 3, 2, 2, 2, 130, 133, 3, 2, 2,
+	2, 131, 129, 3, 2, 2, 2, 131, 132, 3, 2, 2, 2, 132, 134, 3, 2, 2, 2, 133,
+	131, 3, 2, 2, 2, 134, 135, 7, 30, 2, 2, 135, 136, 7, 30, 2, 2, 136, 148,
+	3, 2, 2, 2, 137, 138, 7, 37, 2, 2, 138, 139, 7, 39, 2, 2, 139, 143, 7,
+	29, 2, 2, 140, 142, 5, 10, 6, 2, 141, 140, 3, 2, 2, 2, 142, 145, 3, 2,
+	2, 2, 143, 141, 3, 2, 2, 2, 143, 144, 3, 2, 2, 2, 144, 146, 3, 2, 2, 2,
+	145, 143, 3, 2, 2, 2, 146, 148, 7, 30, 2, 2, 147, 108, 3, 2, 2, 2, 147,
+	137, 3, 2, 2, 2, 148, 13, 3, 2, 2, 2, 149, 151, 5, 12, 7, 2, 150, 149,
+	3, 2, 2, 2, 151, 154, 3, 2, 2, 2, 152, 150, 3, 2, 2, 2, 152, 153, 3, 2,
+	2, 2, 153, 15, 3, 2, 2, 2, 154, 152, 3, 2, 2, 2, 14, 21, 60, 63, 69, 71,
+	88, 98, 122, 131, 143, 147, 152,
 }
 
 var deserializer = antlr.NewATNDeserializer(nil)
@@ -86,17 +94,18 @@ var literalNames = []string{
 	"", "'('", "','", "')'", "'.'", "'+'", "'-'", "'~'", "'!'", "'*'", "'/'",
 	"'%'", "'<<'", "'>>'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&'",
 	"'^'", "'|'", "'&&'", "'||'", "'='", "';'", "'{'", "'}'", "'shader'", "'uniform'",
-	"'attribute'", "'varying'", "'vs'", "'fs'",
+	"'attribute'", "'varying'", "'vs'", "'fs'", "'vertex'",
 }
 
 var symbolicNames = []string{
 	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "NUM",
-	"ID", "SINGLE_LINE_COMMENT", "WS",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"NUM", "ID", "SINGLE_LINE_COMMENT", "WS",
 }
 
 var ruleNames = []string{
-	"expr", "statement", "field", "format", "shaderDecl", "file",
+	"expr", "statement", "field", "format", "vertexComponent", "topLevelDecl",
+	"file",
 }
 
 type LumenParser struct {
@@ -161,20 +170,22 @@ const (
 	LumenParserT__31               = 32
 	LumenParserT__32               = 33
 	LumenParserT__33               = 34
-	LumenParserNUM                 = 35
-	LumenParserID                  = 36
-	LumenParserSINGLE_LINE_COMMENT = 37
-	LumenParserWS                  = 38
+	LumenParserT__34               = 35
+	LumenParserNUM                 = 36
+	LumenParserID                  = 37
+	LumenParserSINGLE_LINE_COMMENT = 38
+	LumenParserWS                  = 39
 )
 
 // LumenParser rules.
 const (
-	LumenParserRULE_expr       = 0
-	LumenParserRULE_statement  = 1
-	LumenParserRULE_field      = 2
-	LumenParserRULE_format     = 3
-	LumenParserRULE_shaderDecl = 4
-	LumenParserRULE_file       = 5
+	LumenParserRULE_expr            = 0
+	LumenParserRULE_statement       = 1
+	LumenParserRULE_field           = 2
+	LumenParserRULE_format          = 3
+	LumenParserRULE_vertexComponent = 4
+	LumenParserRULE_topLevelDecl    = 5
+	LumenParserRULE_file            = 6
 )
 
 // IExprContext is an interface to support dynamic dispatch.
@@ -578,7 +589,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(17)
+	p.SetState(19)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
@@ -587,7 +598,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 
-		p.SetState(13)
+		p.SetState(15)
 
 		var _lt = p.GetTokenStream().LT(1)
 
@@ -604,7 +615,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 			p.Consume()
 		}
 		{
-			p.SetState(14)
+			p.SetState(16)
 
 			var _x = p.expr(13)
 
@@ -616,7 +627,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(15)
+			p.SetState(17)
 
 			var _m = p.Match(LumenParserID)
 
@@ -628,7 +639,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(16)
+			p.SetState(18)
 
 			var _m = p.Match(LumenParserNUM)
 
@@ -639,7 +650,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(67)
+	p.SetState(69)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 
@@ -649,7 +660,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(65)
+			p.SetState(67)
 			p.GetErrorHandler().Sync(p)
 			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
 			case 1:
@@ -657,12 +668,12 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(19)
+				p.SetState(21)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 12)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 12)", ""))
 				}
-				p.SetState(20)
+				p.SetState(22)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -679,7 +690,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 					p.Consume()
 				}
 				{
-					p.SetState(21)
+					p.SetState(23)
 
 					var _x = p.expr(13)
 
@@ -691,12 +702,12 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(22)
+				p.SetState(24)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 11)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 11)", ""))
 				}
-				p.SetState(23)
+				p.SetState(25)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -713,7 +724,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 					p.Consume()
 				}
 				{
-					p.SetState(24)
+					p.SetState(26)
 
 					var _x = p.expr(12)
 
@@ -725,12 +736,12 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(25)
+				p.SetState(27)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 10)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 10)", ""))
 				}
-				p.SetState(26)
+				p.SetState(28)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -747,7 +758,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 					p.Consume()
 				}
 				{
-					p.SetState(27)
+					p.SetState(29)
 
 					var _x = p.expr(11)
 
@@ -759,12 +770,12 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(28)
+				p.SetState(30)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
 				}
-				p.SetState(29)
+				p.SetState(31)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -781,7 +792,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 					p.Consume()
 				}
 				{
-					p.SetState(30)
+					p.SetState(32)
 
 					var _x = p.expr(10)
 
@@ -793,12 +804,12 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(31)
+				p.SetState(33)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
 				}
-				p.SetState(32)
+				p.SetState(34)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -815,7 +826,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 					p.Consume()
 				}
 				{
-					p.SetState(33)
+					p.SetState(35)
 
 					var _x = p.expr(9)
 
@@ -827,20 +838,20 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(34)
+				p.SetState(36)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
 				}
 				{
-					p.SetState(35)
+					p.SetState(37)
 
 					var _m = p.Match(LumenParserT__19)
 
 					localctx.(*InfixContext).op = _m
 				}
 				{
-					p.SetState(36)
+					p.SetState(38)
 
 					var _x = p.expr(8)
 
@@ -852,20 +863,20 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(37)
+				p.SetState(39)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
 				}
 				{
-					p.SetState(38)
+					p.SetState(40)
 
 					var _m = p.Match(LumenParserT__20)
 
 					localctx.(*InfixContext).op = _m
 				}
 				{
-					p.SetState(39)
+					p.SetState(41)
 
 					var _x = p.expr(7)
 
@@ -877,20 +888,20 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(40)
+				p.SetState(42)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
 				}
 				{
-					p.SetState(41)
+					p.SetState(43)
 
 					var _m = p.Match(LumenParserT__21)
 
 					localctx.(*InfixContext).op = _m
 				}
 				{
-					p.SetState(42)
+					p.SetState(44)
 
 					var _x = p.expr(6)
 
@@ -902,20 +913,20 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(43)
+				p.SetState(45)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
 				}
 				{
-					p.SetState(44)
+					p.SetState(46)
 
 					var _m = p.Match(LumenParserT__22)
 
 					localctx.(*InfixContext).op = _m
 				}
 				{
-					p.SetState(45)
+					p.SetState(47)
 
 					var _x = p.expr(5)
 
@@ -927,20 +938,20 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*InfixContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(46)
+				p.SetState(48)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
 				}
 				{
-					p.SetState(47)
+					p.SetState(49)
 
 					var _m = p.Match(LumenParserT__23)
 
 					localctx.(*InfixContext).op = _m
 				}
 				{
-					p.SetState(48)
+					p.SetState(50)
 
 					var _x = p.expr(4)
 
@@ -952,39 +963,39 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*CallContext).value = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(49)
+				p.SetState(51)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 15)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 15)", ""))
 				}
 				{
-					p.SetState(50)
+					p.SetState(52)
 					p.Match(LumenParserT__0)
 				}
-				p.SetState(59)
+				p.SetState(61)
 				p.GetErrorHandler().Sync(p)
 				_la = p.GetTokenStream().LA(1)
 
-				if ((_la-5)&-(0x1f+1)) == 0 && ((1<<uint((_la-5)))&((1<<(LumenParserT__4-5))|(1<<(LumenParserT__5-5))|(1<<(LumenParserT__6-5))|(1<<(LumenParserT__7-5))|(1<<(LumenParserNUM-5))|(1<<(LumenParserID-5)))) != 0 {
+				if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<LumenParserT__4)|(1<<LumenParserT__5)|(1<<LumenParserT__6)|(1<<LumenParserT__7))) != 0) || _la == LumenParserNUM || _la == LumenParserID {
 					{
-						p.SetState(51)
+						p.SetState(53)
 
 						var _x = p.expr(0)
 
 						localctx.(*CallContext)._expr = _x
 					}
 					localctx.(*CallContext).args = append(localctx.(*CallContext).args, localctx.(*CallContext)._expr)
-					p.SetState(56)
+					p.SetState(58)
 					p.GetErrorHandler().Sync(p)
 					_la = p.GetTokenStream().LA(1)
 
 					for _la == LumenParserT__1 {
 						{
-							p.SetState(52)
+							p.SetState(54)
 							p.Match(LumenParserT__1)
 						}
 						{
-							p.SetState(53)
+							p.SetState(55)
 
 							var _x = p.expr(0)
 
@@ -992,14 +1003,14 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 						}
 						localctx.(*CallContext).args = append(localctx.(*CallContext).args, localctx.(*CallContext)._expr)
 
-						p.SetState(58)
+						p.SetState(60)
 						p.GetErrorHandler().Sync(p)
 						_la = p.GetTokenStream().LA(1)
 					}
 
 				}
 				{
-					p.SetState(61)
+					p.SetState(63)
 					p.Match(LumenParserT__2)
 				}
 
@@ -1008,17 +1019,17 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*GetAttrContext).value = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, LumenParserRULE_expr)
-				p.SetState(62)
+				p.SetState(64)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 14)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 14)", ""))
 				}
 				{
-					p.SetState(63)
+					p.SetState(65)
 					p.Match(LumenParserT__3)
 				}
 				{
-					p.SetState(64)
+					p.SetState(66)
 
 					var _m = p.Match(LumenParserID)
 
@@ -1028,7 +1039,7 @@ func (p *LumenParser) expr(_p int) (localctx IExprContext) {
 			}
 
 		}
-		p.SetState(69)
+		p.SetState(71)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 4, p.GetParserRuleContext())
 	}
@@ -1268,39 +1279,39 @@ func (p *LumenParser) Statement() (localctx IStatementContext) {
 		}
 	}()
 
-	p.SetState(84)
+	p.SetState(86)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewVarDeclContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(70)
+			p.SetState(72)
 
 			var _m = p.Match(LumenParserID)
 
 			localctx.(*VarDeclContext).t = _m
 		}
 		{
-			p.SetState(71)
+			p.SetState(73)
 
 			var _m = p.Match(LumenParserID)
 
 			localctx.(*VarDeclContext).name = _m
 		}
 		{
-			p.SetState(72)
+			p.SetState(74)
 			p.Match(LumenParserT__24)
 		}
 		{
-			p.SetState(73)
+			p.SetState(75)
 
 			var _x = p.expr(0)
 
 			localctx.(*VarDeclContext).value = _x
 		}
 		{
-			p.SetState(74)
+			p.SetState(76)
 			p.Match(LumenParserT__25)
 		}
 
@@ -1308,25 +1319,25 @@ func (p *LumenParser) Statement() (localctx IStatementContext) {
 		localctx = NewAssignContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(76)
+			p.SetState(78)
 
 			var _m = p.Match(LumenParserID)
 
 			localctx.(*AssignContext).name = _m
 		}
 		{
-			p.SetState(77)
+			p.SetState(79)
 			p.Match(LumenParserT__24)
 		}
 		{
-			p.SetState(78)
+			p.SetState(80)
 
 			var _x = p.expr(0)
 
 			localctx.(*AssignContext).value = _x
 		}
 		{
-			p.SetState(79)
+			p.SetState(81)
 			p.Match(LumenParserT__25)
 		}
 
@@ -1334,14 +1345,14 @@ func (p *LumenParser) Statement() (localctx IStatementContext) {
 		localctx = NewDiscardContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(81)
+			p.SetState(83)
 
 			var _x = p.expr(0)
 
 			localctx.(*DiscardContext).value = _x
 		}
 		{
-			p.SetState(82)
+			p.SetState(84)
 			p.Match(LumenParserT__25)
 		}
 
@@ -1460,21 +1471,21 @@ func (p *LumenParser) Field() (localctx IFieldContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(86)
+		p.SetState(88)
 
 		var _m = p.Match(LumenParserID)
 
 		localctx.(*FieldContext).name = _m
 	}
 	{
-		p.SetState(87)
+		p.SetState(89)
 
 		var _m = p.Match(LumenParserID)
 
 		localctx.(*FieldContext).t = _m
 	}
 	{
-		p.SetState(88)
+		p.SetState(90)
 		p.Match(LumenParserT__25)
 	}
 
@@ -1607,16 +1618,16 @@ func (p *LumenParser) Format() (localctx IFormatContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(90)
+		p.SetState(92)
 		p.Match(LumenParserT__26)
 	}
-	p.SetState(94)
+	p.SetState(96)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == LumenParserID {
 		{
-			p.SetState(91)
+			p.SetState(93)
 
 			var _x = p.Field()
 
@@ -1624,20 +1635,20 @@ func (p *LumenParser) Format() (localctx IFormatContext) {
 		}
 		localctx.(*FormatContext).fields = append(localctx.(*FormatContext).fields, localctx.(*FormatContext)._field)
 
-		p.SetState(96)
+		p.SetState(98)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(97)
+		p.SetState(99)
 		p.Match(LumenParserT__27)
 	}
 
 	return localctx
 }
 
-// IShaderDeclContext is an interface to support dynamic dispatch.
-type IShaderDeclContext interface {
+// IVertexComponentContext is an interface to support dynamic dispatch.
+type IVertexComponentContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -1646,52 +1657,197 @@ type IShaderDeclContext interface {
 	// GetName returns the name token.
 	GetName() antlr.Token
 
+	// GetT returns the t token.
+	GetT() antlr.Token
+
+	// GetEncoding returns the encoding token.
+	GetEncoding() antlr.Token
+
 	// SetName sets the name token.
 	SetName(antlr.Token)
 
-	// GetUniform returns the uniform rule contexts.
-	GetUniform() IFormatContext
+	// SetT sets the t token.
+	SetT(antlr.Token)
 
-	// GetAttribute returns the attribute rule contexts.
-	GetAttribute() IFormatContext
+	// SetEncoding sets the encoding token.
+	SetEncoding(antlr.Token)
 
-	// GetVarying returns the varying rule contexts.
-	GetVarying() IFormatContext
+	// IsVertexComponentContext differentiates from other interfaces.
+	IsVertexComponentContext()
+}
 
-	// Get_statement returns the _statement rule contexts.
-	Get_statement() IStatementContext
+type VertexComponentContext struct {
+	*antlr.BaseParserRuleContext
+	parser   antlr.Parser
+	name     antlr.Token
+	t        antlr.Token
+	encoding antlr.Token
+}
 
-	// SetUniform sets the uniform rule contexts.
-	SetUniform(IFormatContext)
+func NewEmptyVertexComponentContext() *VertexComponentContext {
+	var p = new(VertexComponentContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = LumenParserRULE_vertexComponent
+	return p
+}
 
-	// SetAttribute sets the attribute rule contexts.
-	SetAttribute(IFormatContext)
+func (*VertexComponentContext) IsVertexComponentContext() {}
 
-	// SetVarying sets the varying rule contexts.
-	SetVarying(IFormatContext)
+func NewVertexComponentContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *VertexComponentContext {
+	var p = new(VertexComponentContext)
 
-	// Set_statement sets the _statement rule contexts.
-	Set_statement(IStatementContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
-	// GetVs returns the vs rule context list.
-	GetVs() []IStatementContext
+	p.parser = parser
+	p.RuleIndex = LumenParserRULE_vertexComponent
 
-	// GetFs returns the fs rule context list.
-	GetFs() []IStatementContext
+	return p
+}
 
-	// SetVs sets the vs rule context list.
-	SetVs([]IStatementContext)
+func (s *VertexComponentContext) GetParser() antlr.Parser { return s.parser }
 
-	// SetFs sets the fs rule context list.
-	SetFs([]IStatementContext)
+func (s *VertexComponentContext) GetName() antlr.Token { return s.name }
 
-	// IsShaderDeclContext differentiates from other interfaces.
-	IsShaderDeclContext()
+func (s *VertexComponentContext) GetT() antlr.Token { return s.t }
+
+func (s *VertexComponentContext) GetEncoding() antlr.Token { return s.encoding }
+
+func (s *VertexComponentContext) SetName(v antlr.Token) { s.name = v }
+
+func (s *VertexComponentContext) SetT(v antlr.Token) { s.t = v }
+
+func (s *VertexComponentContext) SetEncoding(v antlr.Token) { s.encoding = v }
+
+func (s *VertexComponentContext) AllID() []antlr.TerminalNode {
+	return s.GetTokens(LumenParserID)
+}
+
+func (s *VertexComponentContext) ID(i int) antlr.TerminalNode {
+	return s.GetToken(LumenParserID, i)
+}
+
+func (s *VertexComponentContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *VertexComponentContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *VertexComponentContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(LumenListener); ok {
+		listenerT.EnterVertexComponent(s)
+	}
+}
+
+func (s *VertexComponentContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(LumenListener); ok {
+		listenerT.ExitVertexComponent(s)
+	}
+}
+
+func (p *LumenParser) VertexComponent() (localctx IVertexComponentContext) {
+	localctx = NewVertexComponentContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 8, LumenParserRULE_vertexComponent)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(101)
+
+		var _m = p.Match(LumenParserID)
+
+		localctx.(*VertexComponentContext).name = _m
+	}
+	{
+		p.SetState(102)
+
+		var _m = p.Match(LumenParserID)
+
+		localctx.(*VertexComponentContext).t = _m
+	}
+	{
+		p.SetState(103)
+
+		var _m = p.Match(LumenParserID)
+
+		localctx.(*VertexComponentContext).encoding = _m
+	}
+	{
+		p.SetState(104)
+		p.Match(LumenParserT__25)
+	}
+
+	return localctx
+}
+
+// ITopLevelDeclContext is an interface to support dynamic dispatch.
+type ITopLevelDeclContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsTopLevelDeclContext differentiates from other interfaces.
+	IsTopLevelDeclContext()
+}
+
+type TopLevelDeclContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyTopLevelDeclContext() *TopLevelDeclContext {
+	var p = new(TopLevelDeclContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = LumenParserRULE_topLevelDecl
+	return p
+}
+
+func (*TopLevelDeclContext) IsTopLevelDeclContext() {}
+
+func NewTopLevelDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TopLevelDeclContext {
+	var p = new(TopLevelDeclContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = LumenParserRULE_topLevelDecl
+
+	return p
+}
+
+func (s *TopLevelDeclContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *TopLevelDeclContext) CopyFrom(ctx *TopLevelDeclContext) {
+	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
+}
+
+func (s *TopLevelDeclContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *TopLevelDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
 type ShaderDeclContext struct {
-	*antlr.BaseParserRuleContext
-	parser     antlr.Parser
+	*TopLevelDeclContext
 	name       antlr.Token
 	uniform    IFormatContext
 	attribute  IFormatContext
@@ -1701,27 +1857,15 @@ type ShaderDeclContext struct {
 	fs         []IStatementContext
 }
 
-func NewEmptyShaderDeclContext() *ShaderDeclContext {
-	var p = new(ShaderDeclContext)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = LumenParserRULE_shaderDecl
-	return p
-}
-
-func (*ShaderDeclContext) IsShaderDeclContext() {}
-
-func NewShaderDeclContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ShaderDeclContext {
+func NewShaderDeclContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ShaderDeclContext {
 	var p = new(ShaderDeclContext)
 
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
-
+	p.TopLevelDeclContext = NewEmptyTopLevelDeclContext()
 	p.parser = parser
-	p.RuleIndex = LumenParserRULE_shaderDecl
+	p.CopyFrom(ctx.(*TopLevelDeclContext))
 
 	return p
 }
-
-func (s *ShaderDeclContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *ShaderDeclContext) GetName() antlr.Token { return s.name }
 
@@ -1750,6 +1894,10 @@ func (s *ShaderDeclContext) GetFs() []IStatementContext { return s.fs }
 func (s *ShaderDeclContext) SetVs(v []IStatementContext) { s.vs = v }
 
 func (s *ShaderDeclContext) SetFs(v []IStatementContext) { s.fs = v }
+
+func (s *ShaderDeclContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
 
 func (s *ShaderDeclContext) ID() antlr.TerminalNode {
 	return s.GetToken(LumenParserID, 0)
@@ -1801,14 +1949,6 @@ func (s *ShaderDeclContext) Statement(i int) IStatementContext {
 	return t.(IStatementContext)
 }
 
-func (s *ShaderDeclContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *ShaderDeclContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
 func (s *ShaderDeclContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(LumenListener); ok {
 		listenerT.EnterShaderDecl(s)
@@ -1821,9 +1961,81 @@ func (s *ShaderDeclContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-func (p *LumenParser) ShaderDecl() (localctx IShaderDeclContext) {
-	localctx = NewShaderDeclContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, LumenParserRULE_shaderDecl)
+type VertexDeclContext struct {
+	*TopLevelDeclContext
+	name             antlr.Token
+	_vertexComponent IVertexComponentContext
+	components       []IVertexComponentContext
+}
+
+func NewVertexDeclContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *VertexDeclContext {
+	var p = new(VertexDeclContext)
+
+	p.TopLevelDeclContext = NewEmptyTopLevelDeclContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*TopLevelDeclContext))
+
+	return p
+}
+
+func (s *VertexDeclContext) GetName() antlr.Token { return s.name }
+
+func (s *VertexDeclContext) SetName(v antlr.Token) { s.name = v }
+
+func (s *VertexDeclContext) Get_vertexComponent() IVertexComponentContext { return s._vertexComponent }
+
+func (s *VertexDeclContext) Set_vertexComponent(v IVertexComponentContext) { s._vertexComponent = v }
+
+func (s *VertexDeclContext) GetComponents() []IVertexComponentContext { return s.components }
+
+func (s *VertexDeclContext) SetComponents(v []IVertexComponentContext) { s.components = v }
+
+func (s *VertexDeclContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *VertexDeclContext) ID() antlr.TerminalNode {
+	return s.GetToken(LumenParserID, 0)
+}
+
+func (s *VertexDeclContext) AllVertexComponent() []IVertexComponentContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IVertexComponentContext)(nil)).Elem())
+	var tst = make([]IVertexComponentContext, len(ts))
+
+	for i, t := range ts {
+		if t != nil {
+			tst[i] = t.(IVertexComponentContext)
+		}
+	}
+
+	return tst
+}
+
+func (s *VertexDeclContext) VertexComponent(i int) IVertexComponentContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IVertexComponentContext)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IVertexComponentContext)
+}
+
+func (s *VertexDeclContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(LumenListener); ok {
+		listenerT.EnterVertexDecl(s)
+	}
+}
+
+func (s *VertexDeclContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(LumenListener); ok {
+		listenerT.ExitVertexDecl(s)
+	}
+}
+
+func (p *LumenParser) TopLevelDecl() (localctx ITopLevelDeclContext) {
+	localctx = NewTopLevelDeclContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 10, LumenParserRULE_topLevelDecl)
 	var _la int
 
 	defer func() {
@@ -1842,118 +2054,169 @@ func (p *LumenParser) ShaderDecl() (localctx IShaderDeclContext) {
 		}
 	}()
 
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(99)
-		p.Match(LumenParserT__28)
-	}
-	{
-		p.SetState(100)
-
-		var _m = p.Match(LumenParserID)
-
-		localctx.(*ShaderDeclContext).name = _m
-	}
-	{
-		p.SetState(101)
-		p.Match(LumenParserT__26)
-	}
-	{
-		p.SetState(102)
-		p.Match(LumenParserT__29)
-	}
-	{
-		p.SetState(103)
-
-		var _x = p.Format()
-
-		localctx.(*ShaderDeclContext).uniform = _x
-	}
-	{
-		p.SetState(104)
-		p.Match(LumenParserT__30)
-	}
-	{
-		p.SetState(105)
-
-		var _x = p.Format()
-
-		localctx.(*ShaderDeclContext).attribute = _x
-	}
-	{
-		p.SetState(106)
-		p.Match(LumenParserT__31)
-	}
-	{
-		p.SetState(107)
-
-		var _x = p.Format()
-
-		localctx.(*ShaderDeclContext).varying = _x
-	}
-	{
-		p.SetState(108)
-		p.Match(LumenParserT__32)
-	}
-	{
-		p.SetState(109)
-		p.Match(LumenParserT__26)
-	}
-	p.SetState(113)
+	p.SetState(145)
 	p.GetErrorHandler().Sync(p)
-	_la = p.GetTokenStream().LA(1)
 
-	for ((_la-5)&-(0x1f+1)) == 0 && ((1<<uint((_la-5)))&((1<<(LumenParserT__4-5))|(1<<(LumenParserT__5-5))|(1<<(LumenParserT__6-5))|(1<<(LumenParserT__7-5))|(1<<(LumenParserNUM-5))|(1<<(LumenParserID-5)))) != 0 {
+	switch p.GetTokenStream().LA(1) {
+	case LumenParserT__28:
+		localctx = NewShaderDeclContext(p, localctx)
+		p.EnterOuterAlt(localctx, 1)
+		{
+			p.SetState(106)
+			p.Match(LumenParserT__28)
+		}
+		{
+			p.SetState(107)
+
+			var _m = p.Match(LumenParserID)
+
+			localctx.(*ShaderDeclContext).name = _m
+		}
+		{
+			p.SetState(108)
+			p.Match(LumenParserT__26)
+		}
+		{
+			p.SetState(109)
+			p.Match(LumenParserT__29)
+		}
 		{
 			p.SetState(110)
 
-			var _x = p.Statement()
+			var _x = p.Format()
 
-			localctx.(*ShaderDeclContext)._statement = _x
+			localctx.(*ShaderDeclContext).uniform = _x
 		}
-		localctx.(*ShaderDeclContext).vs = append(localctx.(*ShaderDeclContext).vs, localctx.(*ShaderDeclContext)._statement)
-
-		p.SetState(115)
-		p.GetErrorHandler().Sync(p)
-		_la = p.GetTokenStream().LA(1)
-	}
-	{
-		p.SetState(116)
-		p.Match(LumenParserT__27)
-	}
-	{
-		p.SetState(117)
-		p.Match(LumenParserT__33)
-	}
-	{
-		p.SetState(118)
-		p.Match(LumenParserT__26)
-	}
-	p.SetState(122)
-	p.GetErrorHandler().Sync(p)
-	_la = p.GetTokenStream().LA(1)
-
-	for ((_la-5)&-(0x1f+1)) == 0 && ((1<<uint((_la-5)))&((1<<(LumenParserT__4-5))|(1<<(LumenParserT__5-5))|(1<<(LumenParserT__6-5))|(1<<(LumenParserT__7-5))|(1<<(LumenParserNUM-5))|(1<<(LumenParserID-5)))) != 0 {
 		{
-			p.SetState(119)
-
-			var _x = p.Statement()
-
-			localctx.(*ShaderDeclContext)._statement = _x
+			p.SetState(111)
+			p.Match(LumenParserT__30)
 		}
-		localctx.(*ShaderDeclContext).fs = append(localctx.(*ShaderDeclContext).fs, localctx.(*ShaderDeclContext)._statement)
+		{
+			p.SetState(112)
 
-		p.SetState(124)
+			var _x = p.Format()
+
+			localctx.(*ShaderDeclContext).attribute = _x
+		}
+		{
+			p.SetState(113)
+			p.Match(LumenParserT__31)
+		}
+		{
+			p.SetState(114)
+
+			var _x = p.Format()
+
+			localctx.(*ShaderDeclContext).varying = _x
+		}
+		{
+			p.SetState(115)
+			p.Match(LumenParserT__32)
+		}
+		{
+			p.SetState(116)
+			p.Match(LumenParserT__26)
+		}
+		p.SetState(120)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
-	}
-	{
-		p.SetState(125)
-		p.Match(LumenParserT__27)
-	}
-	{
-		p.SetState(126)
-		p.Match(LumenParserT__27)
+
+		for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<LumenParserT__4)|(1<<LumenParserT__5)|(1<<LumenParserT__6)|(1<<LumenParserT__7))) != 0) || _la == LumenParserNUM || _la == LumenParserID {
+			{
+				p.SetState(117)
+
+				var _x = p.Statement()
+
+				localctx.(*ShaderDeclContext)._statement = _x
+			}
+			localctx.(*ShaderDeclContext).vs = append(localctx.(*ShaderDeclContext).vs, localctx.(*ShaderDeclContext)._statement)
+
+			p.SetState(122)
+			p.GetErrorHandler().Sync(p)
+			_la = p.GetTokenStream().LA(1)
+		}
+		{
+			p.SetState(123)
+			p.Match(LumenParserT__27)
+		}
+		{
+			p.SetState(124)
+			p.Match(LumenParserT__33)
+		}
+		{
+			p.SetState(125)
+			p.Match(LumenParserT__26)
+		}
+		p.SetState(129)
+		p.GetErrorHandler().Sync(p)
+		_la = p.GetTokenStream().LA(1)
+
+		for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<LumenParserT__4)|(1<<LumenParserT__5)|(1<<LumenParserT__6)|(1<<LumenParserT__7))) != 0) || _la == LumenParserNUM || _la == LumenParserID {
+			{
+				p.SetState(126)
+
+				var _x = p.Statement()
+
+				localctx.(*ShaderDeclContext)._statement = _x
+			}
+			localctx.(*ShaderDeclContext).fs = append(localctx.(*ShaderDeclContext).fs, localctx.(*ShaderDeclContext)._statement)
+
+			p.SetState(131)
+			p.GetErrorHandler().Sync(p)
+			_la = p.GetTokenStream().LA(1)
+		}
+		{
+			p.SetState(132)
+			p.Match(LumenParserT__27)
+		}
+		{
+			p.SetState(133)
+			p.Match(LumenParserT__27)
+		}
+
+	case LumenParserT__34:
+		localctx = NewVertexDeclContext(p, localctx)
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(135)
+			p.Match(LumenParserT__34)
+		}
+		{
+			p.SetState(136)
+
+			var _m = p.Match(LumenParserID)
+
+			localctx.(*VertexDeclContext).name = _m
+		}
+		{
+			p.SetState(137)
+			p.Match(LumenParserT__26)
+		}
+		p.SetState(141)
+		p.GetErrorHandler().Sync(p)
+		_la = p.GetTokenStream().LA(1)
+
+		for _la == LumenParserID {
+			{
+				p.SetState(138)
+
+				var _x = p.VertexComponent()
+
+				localctx.(*VertexDeclContext)._vertexComponent = _x
+			}
+			localctx.(*VertexDeclContext).components = append(localctx.(*VertexDeclContext).components, localctx.(*VertexDeclContext)._vertexComponent)
+
+			p.SetState(143)
+			p.GetErrorHandler().Sync(p)
+			_la = p.GetTokenStream().LA(1)
+		}
+		{
+			p.SetState(144)
+			p.Match(LumenParserT__27)
+		}
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 
 	return localctx
@@ -1966,17 +2229,17 @@ type IFileContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// Get_shaderDecl returns the _shaderDecl rule contexts.
-	Get_shaderDecl() IShaderDeclContext
+	// Get_topLevelDecl returns the _topLevelDecl rule contexts.
+	Get_topLevelDecl() ITopLevelDeclContext
 
-	// Set_shaderDecl sets the _shaderDecl rule contexts.
-	Set_shaderDecl(IShaderDeclContext)
+	// Set_topLevelDecl sets the _topLevelDecl rule contexts.
+	Set_topLevelDecl(ITopLevelDeclContext)
 
-	// GetShaders returns the shaders rule context list.
-	GetShaders() []IShaderDeclContext
+	// GetDecls returns the decls rule context list.
+	GetDecls() []ITopLevelDeclContext
 
-	// SetShaders sets the shaders rule context list.
-	SetShaders([]IShaderDeclContext)
+	// SetDecls sets the decls rule context list.
+	SetDecls([]ITopLevelDeclContext)
 
 	// IsFileContext differentiates from other interfaces.
 	IsFileContext()
@@ -1984,9 +2247,9 @@ type IFileContext interface {
 
 type FileContext struct {
 	*antlr.BaseParserRuleContext
-	parser      antlr.Parser
-	_shaderDecl IShaderDeclContext
-	shaders     []IShaderDeclContext
+	parser        antlr.Parser
+	_topLevelDecl ITopLevelDeclContext
+	decls         []ITopLevelDeclContext
 }
 
 func NewEmptyFileContext() *FileContext {
@@ -2011,35 +2274,35 @@ func NewFileContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *FileContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *FileContext) Get_shaderDecl() IShaderDeclContext { return s._shaderDecl }
+func (s *FileContext) Get_topLevelDecl() ITopLevelDeclContext { return s._topLevelDecl }
 
-func (s *FileContext) Set_shaderDecl(v IShaderDeclContext) { s._shaderDecl = v }
+func (s *FileContext) Set_topLevelDecl(v ITopLevelDeclContext) { s._topLevelDecl = v }
 
-func (s *FileContext) GetShaders() []IShaderDeclContext { return s.shaders }
+func (s *FileContext) GetDecls() []ITopLevelDeclContext { return s.decls }
 
-func (s *FileContext) SetShaders(v []IShaderDeclContext) { s.shaders = v }
+func (s *FileContext) SetDecls(v []ITopLevelDeclContext) { s.decls = v }
 
-func (s *FileContext) AllShaderDecl() []IShaderDeclContext {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IShaderDeclContext)(nil)).Elem())
-	var tst = make([]IShaderDeclContext, len(ts))
+func (s *FileContext) AllTopLevelDecl() []ITopLevelDeclContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*ITopLevelDeclContext)(nil)).Elem())
+	var tst = make([]ITopLevelDeclContext, len(ts))
 
 	for i, t := range ts {
 		if t != nil {
-			tst[i] = t.(IShaderDeclContext)
+			tst[i] = t.(ITopLevelDeclContext)
 		}
 	}
 
 	return tst
 }
 
-func (s *FileContext) ShaderDecl(i int) IShaderDeclContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IShaderDeclContext)(nil)).Elem(), i)
+func (s *FileContext) TopLevelDecl(i int) ITopLevelDeclContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITopLevelDeclContext)(nil)).Elem(), i)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(IShaderDeclContext)
+	return t.(ITopLevelDeclContext)
 }
 
 func (s *FileContext) GetRuleContext() antlr.RuleContext {
@@ -2064,7 +2327,7 @@ func (s *FileContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *LumenParser) File() (localctx IFileContext) {
 	localctx = NewFileContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, LumenParserRULE_file)
+	p.EnterRule(localctx, 12, LumenParserRULE_file)
 	var _la int
 
 	defer func() {
@@ -2084,21 +2347,21 @@ func (p *LumenParser) File() (localctx IFileContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(131)
+	p.SetState(150)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == LumenParserT__28 {
+	for _la == LumenParserT__28 || _la == LumenParserT__34 {
 		{
-			p.SetState(128)
+			p.SetState(147)
 
-			var _x = p.ShaderDecl()
+			var _x = p.TopLevelDecl()
 
-			localctx.(*FileContext)._shaderDecl = _x
+			localctx.(*FileContext)._topLevelDecl = _x
 		}
-		localctx.(*FileContext).shaders = append(localctx.(*FileContext).shaders, localctx.(*FileContext)._shaderDecl)
+		localctx.(*FileContext).decls = append(localctx.(*FileContext).decls, localctx.(*FileContext)._topLevelDecl)
 
-		p.SetState(133)
+		p.SetState(152)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}

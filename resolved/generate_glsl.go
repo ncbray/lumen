@@ -9,7 +9,11 @@ import (
 
 func typeName(t Type) string {
 	switch t := t.(type) {
-	case *IntrinsicType:
+	case *ScalarType:
+		return t.Name
+	case *VectorType:
+		return t.Name
+	case *MatrixType:
 		return t.Name
 	default:
 		panic(t)
@@ -169,9 +173,9 @@ func GenerateGLSLFragShader(s *ShaderProgram, declPrecision bool, out io.Writer)
 
 func isSampler(t Type) bool {
 	switch t := t.(type) {
-	case *IntrinsicType:
+	case *ScalarType:
 		return strings.HasPrefix(t.Name, "sampler")
 	default:
-		panic(t)
+		return false
 	}
 }
