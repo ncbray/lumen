@@ -107,6 +107,7 @@ func run() bool {
 			Files: []string{
 				"ast.dsl",
 				"resolved.dsl",
+				"vecgen.dsl",
 			},
 		},
 	}

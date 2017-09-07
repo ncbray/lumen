@@ -41,8 +41,9 @@ func parseFile(filename string, fsys fs.FileSystem, logger log.CompilerLogger) *
 func run() bool {
 	var minify bool
 	var input string
-	var pkg string
-	var target string
+	var typeScript bool
+	var haxeTarget string
+	var haxePkg string
 	var output string
 
 	inputFile := &cmdline.FilePath{
@@ -61,19 +62,23 @@ func run() bool {
 			Long: "minify",
 			Call: cmdline.SetTrue(&minify),
 		},
+		{
+			Long: "ts",
+			Call: cmdline.SetTrue(&typeScript),
+		},
+		{
+			Long:  "haxe-target",
+			Value: targetEnum.Set(&haxeTarget),
+		},
+		{
+			Long:  "haxe-package",
+			Value: cmdline.String.Set(&haxePkg),
+		},
 	})
 	app.RequiredArgs([]*cmdline.Argument{
 		{
 			Name:  "input",
 			Value: inputFile.Set(&input),
-		},
-		{
-			Name:  "target",
-			Value: targetEnum.Set(&target),
-		},
-		{
-			Name:  "package",
-			Value: cmdline.String.Set(&pkg),
 		},
 		{
 			Name:  "output",
@@ -108,7 +113,15 @@ func run() bool {
 		return false
 	}
 	defer ow.Close()
-	resolved.GenerateHaxe(pkg, rfile, target == "android" || target == "html5" || target == "ios", minify, ow)
+
+	if typeScript {
+		resolved.GenerateTypeScript(rfile, minify, ow)
+	}
+
+	// TODO better error checking.
+	if haxeTarget != "" {
+		resolved.GenerateHaxe(haxePkg, rfile, haxeTarget == "android" || haxeTarget == "html5" || haxeTarget == "ios", minify, ow)
+	}
 
 	fsys.Commit()
 	return true
