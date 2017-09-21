@@ -11,6 +11,38 @@ import (
 	"github.com/ncbray/lumen/glsl"
 )
 
+func glslTypeToTypescript(t Type) string {
+	switch t := t.(type) {
+	case *ScalarType:
+		switch t.Name {
+		case "float":
+			return "number"
+		default:
+			panic(t.Name)
+		}
+	case *VectorType:
+		switch t.Name {
+		case "vec2":
+			return "Vector2"
+		case "vec4":
+			return "Vector4"
+		default:
+			panic(t.Name)
+		}
+	case *MatrixType:
+		switch t.Name {
+		case "mat3":
+			return "Matrix3"
+		case "mat4":
+			return "Matrix4"
+		default:
+			panic(t.Name)
+		}
+	default:
+		panic(t)
+	}
+}
+
 func fieldNameList(fields []*Field) string {
 	names := make([]string, len(fields))
 	for i, f := range fields {
@@ -24,7 +56,8 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 
 	o := writer.MakeTabbedWriter("  ", out)
 
-	o.WriteLine("import { Buffer, GraphicsPipeline, VertexArray } from './vapor/graphics';")
+	o.WriteLine("import { Matrix4, Vector4 } from './vapor/math';")
+	o.WriteLine("import { Buffer, GraphicsPipeline, TextureUnit, VertexArray } from './vapor/graphics';")
 	o.WriteLine("import { GL } from './vapor/webgl';")
 
 	for _, v := range file.Vertex {
@@ -217,6 +250,13 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 		o.Dedent()
 		o.WriteLine("}")
 
+		o.EndOfLine()
+		o.WriteLine("createUniforms():" + uniformsClassName + " {")
+		o.Indent()
+		o.WriteLine("return new " + uniformsClassName + "(this);")
+		o.Dedent()
+		o.WriteLine("}")
+
 		// End of class.
 		o.Dedent()
 		o.WriteLine("}")
@@ -225,6 +265,68 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 		o.EndOfLine()
 		o.WriteLine("export class " + uniformsClassName + " {")
 		o.Indent()
+
+		o.WriteLine("private prog:" + shaderClassName + ";")
+		o.WriteLine("private units:Array<TextureUnit>;")
+
+		for _, u := range uniformData {
+			ht := glslTypeToTypescript(u.Type)
+			init := "new " + ht + "()"
+			o.WriteLine(u.Name + ":" + ht + " = " + init + ";")
+		}
+		for _, u := range uniformSamplers {
+			o.WriteLine(u.Name + ":TextureUnit = new TextureUnit();")
+		}
+
+		o.EndOfLine()
+		o.WriteLine("constructor(prog:" + shaderClassName + ") {")
+		o.Indent()
+		o.WriteLine("this.prog = prog;")
+		o.WriteString("this.units = [")
+		for i, u := range uniformSamplers {
+			if i != 0 {
+				o.WriteString(", ")
+			}
+			o.WriteString("this." + u.Name)
+		}
+		o.WriteString("];")
+		o.EndOfLine()
+
+		o.Dedent()
+		o.WriteLine("}")
+
+		o.EndOfLine()
+		o.WriteLine("bind(pipeline:GraphicsPipeline) {")
+		o.Indent()
+		o.WriteLine("const gl = pipeline.gl;")
+		o.WriteLine("const prog = this.prog;")
+		o.WriteLine("gl.useProgram(prog.prog);")
+		for _, u := range uniformData {
+			n := u.Name
+			switch t := u.Type.(type) {
+			case *VectorType:
+				switch t.Name {
+				case "vec4":
+					o.WriteLine("const " + n + " = this." + n + ";")
+					o.WriteLine("gl.uniform4f(prog." + n + ", " + n + ".x, " + n + ".y, " + n + ".z, " + n + ".w);")
+				default:
+					panic(t.Name)
+				}
+			case *MatrixType:
+				switch t.Name {
+				case "mat4":
+					o.WriteLine("this." + n + ".copyOut(pipeline.matrix4Temp, 0);")
+					o.WriteLine("gl.uniformMatrix4fv(prog." + n + ", false, pipeline.matrix4Temp);")
+				default:
+					panic(t.Name)
+				}
+			default:
+				panic(t)
+			}
+		}
+		o.WriteLine("pipeline.bindTextures(this.units);")
+		o.Dedent()
+		o.WriteLine("}")
 
 		// End of class.
 		o.Dedent()
