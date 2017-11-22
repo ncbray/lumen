@@ -57,7 +57,7 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 	o := writer.MakeTabbedWriter("  ", out)
 
 	o.WriteLine("import { Matrix4, Vector4 } from './vapor/math';")
-	o.WriteLine("import { Buffer, GraphicsPipeline, TextureUnit, VertexArray } from './vapor/graphics';")
+	o.WriteLine("import { Buffer, Geometry, GraphicsPipeline, TextureUnit, VertexArray } from './vapor/graphics';")
 	o.WriteLine("import { GL } from './vapor/webgl';")
 
 	for _, v := range file.Vertex {
@@ -120,13 +120,14 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 
 		o.EndOfLine()
 		o.WriteChunk(`
-			beginData() {
-				this.used = 0;
-				this.vertexCount = 0;
+			geometry(geometry:Geometry) {
+				geometry.vao = this.vao;
 			}
 
-			endData(pipeline:GraphicsPipeline) {
+			upload(pipeline:GraphicsPipeline) {
 				pipeline.bufferData(this.buffer, this.u8.subarray(0, this.used));
+				this.used = 0;
+				this.vertexCount = 0;
 			}
 
 			private alloc(required:number):number {
