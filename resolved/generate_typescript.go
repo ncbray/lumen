@@ -64,21 +64,21 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 		o.EndOfLine()
 		o.WriteLine("export class " + v.Name + "Builder {")
 		o.Indent()
-		o.WriteLine("private data:ArrayBuffer;")
+		o.WriteLine("private raw_data:ArrayBuffer;")
 		o.WriteLine("private u8:Uint8Array;")
 		o.WriteLine("private u16:Uint16Array;")
 		o.WriteLine("private f32:Float32Array;")
 		o.WriteLine("private used:number;")
-		o.WriteLine("private vertexCount:number;")
+		o.WriteLine("private vertex_count:number;")
 
-		o.WriteLine("private buffer:Buffer;")
-		o.WriteLine("public vao:VertexArray;")
+		o.WriteLine("private gpu_buffer:Buffer;")
+		o.WriteLine("private vao:VertexArray;")
 
 		o.EndOfLine()
-		o.WriteLine("constructor(buffer:Buffer) {")
+		o.WriteLine("constructor(gpu_buffer:Buffer) {")
 		o.Indent()
 
-		o.WriteLine("this.data = new ArrayBuffer(256);")
+		o.WriteLine("this.raw_data = new ArrayBuffer(256);")
 		o.WriteLine("this.syncViews();")
 		o.WriteLine("this.used = 0;")
 
@@ -109,10 +109,10 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 			// Interleaved
 			o.WriteLine(fmt.Sprintf("a.stride = %d;", v.ByteSize))
 			o.WriteLine(fmt.Sprintf("a.offset = %d;", comp.ByteOffset))
-			o.WriteLine("a.buffer = buffer;")
+			o.WriteLine("a.buffer = gpu_buffer;")
 		}
 		o.EndOfLine()
-		o.WriteLine("this.buffer = buffer;")
+		o.WriteLine("this.gpu_buffer = gpu_buffer;")
 		o.WriteLine("this.vao = vao;")
 
 		o.Dedent()
@@ -124,17 +124,17 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 				geometry.vao = this.vao;
 			}
 
-			upload(pipeline:GraphicsPipeline) {
-				pipeline.bufferData(this.buffer, this.u8.subarray(0, this.used));
+			uploadData(pipeline:GraphicsPipeline) {
+				pipeline.bufferData(this.gpu_buffer, this.u8.subarray(0, this.used));
 				this.used = 0;
-				this.vertexCount = 0;
+				this.vertex_count = 0;
 			}
 
 			private alloc(required:number):number {
 				const temp = this.used;
 				this.used += required;
-				if (this.used > this.data.byteLength) {
-					this.data = new ArrayBuffer(this.data.byteLength * 2);
+				if (this.used > this.raw_data.byteLength) {
+					this.raw_data = new ArrayBuffer(this.raw_data.byteLength * 2);
 					const old = this.u8;
 					this.syncViews();
 					this.u8.set(old.subarray(0, temp));
@@ -143,9 +143,9 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 			}
 
 			private syncViews() {
-				this.u8 = new Uint8Array(this.data);
-				this.u16 = new Uint16Array(this.data);
-				this.f32 = new Float32Array(this.data);
+				this.u8 = new Uint8Array(this.raw_data);
+				this.u16 = new Uint16Array(this.raw_data);
+				this.f32 = new Float32Array(this.raw_data);
 			}
 		`)
 
@@ -190,8 +190,8 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 		}
 
 		o.EndOfLine()
-		o.WriteLine("const temp = this.vertexCount;")
-		o.WriteLine("this.vertexCount += 1;")
+		o.WriteLine("const temp = this.vertex_count;")
+		o.WriteLine("this.vertex_count += 1;")
 		o.WriteLine("return temp;")
 		o.Dedent()
 		o.WriteLine("}")
@@ -316,7 +316,7 @@ func GenerateTypeScript(file *File, minify bool, out io.Writer) {
 			case *MatrixType:
 				switch t.Name {
 				case "mat4":
-					o.WriteLine("this." + n + ".copyOut(pipeline.matrix4Temp, 0);")
+					o.WriteLine("this." + n + ".copyToMemory(pipeline.matrix4Temp, 0);")
 					o.WriteLine("gl.uniformMatrix4fv(prog." + n + ", false, pipeline.matrix4Temp);")
 				default:
 					panic(t.Name)

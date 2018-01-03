@@ -200,6 +200,7 @@ func GenerateTypeScript(out io.Writer) {
 			name := vectorComponents[i]
 			o.WriteLine(fmt.Sprintf("this.%s = %s;", name, name))
 		}
+		o.WriteLine("return this;")
 		o.Dedent()
 		o.WriteLine("}")
 
@@ -325,10 +326,17 @@ func GenerateTypeScript(out io.Writer) {
 
 		o.EndOfLine()
 		o.WriteChunk(`
-      copyOut(dst:Float32Array, offset:number) {
-        dst.set(this.values, offset)
+      copyToMemory(dst:Float32Array, offset:number) {
+        dst.set(this.values, offset);
       }
       `)
+
+		o.EndOfLine()
+		o.WriteChunk(fmt.Sprintf(`
+      copyFrom(other:%s) {
+        this.values.set(other.values);
+      }
+      `, mt.Name))
 
 		o.EndOfLine()
 		o.WriteLine(fmt.Sprintf("invert():%s {", mt.Name))
